@@ -151,9 +151,7 @@ window.Components.Header = ({
                     setShowNotifications(false);
                     setShowLocationModal(false);
                 }} className={`flex items-center gap-3 pl-1 pr-2 py-1 rounded-full border transition group ${showUserMenu ? 'bg-slate-100 border-slate-200 dark:bg-slate-800 dark:border-slate-700' : 'border-transparent hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-400 to-indigo-500 shadow-sm border border-white dark:border-slate-700 flex items-center justify-center font-bold text-white text-xs">
-                        {currentUser?.name ? currentUser.name.substring(0, 2).toUpperCase() : '?'}
-                    </div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-400 to-indigo-500 shadow-sm border border-white dark:border-slate-700"></div>
                     <div className="hidden md:flex flex-col items-end">
                         <div className="flex items-center gap-1">
                             <span className={`text-xs font-bold leading-none max-w-[120px] truncate ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{currentUser?.name || 'Administrator'}</span>

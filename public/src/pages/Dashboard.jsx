@@ -4,7 +4,7 @@ const { Cloud, Plus, CreditCard, CheckCircle, Briefcase, FileText, Activity } = 
 window.Components = window.Components || {};
 
 window.Components.Dashboard = ({
-    currentUser, dailyFocus, handleFocusChange, handleFocusKeyDown, getGreeting,
+    dailyFocus, handleFocusChange, handleFocusKeyDown, getGreeting,
     shortcuts, handleOpenApp
 }) => {
     return (
@@ -13,7 +13,7 @@ window.Components.Dashboard = ({
                 <div className="md:col-span-8 rounded-3xl p-6 md:p-8 bg-white dark:bg-slate-800 shadow-card border border-slate-100 dark:border-slate-700 flex flex-col justify-center">
                     <div className="flex items-center gap-3 mb-2">
                         <span className="text-2xl">👋</span>
-                        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">{getGreeting()}, {currentUser?.name || 'bạn'}!</h2>
+                        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">{getGreeting()}, Administrator!</h2>
                     </div>
                     <div className="mt-4">
                         <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Tâm điểm hôm nay</label>

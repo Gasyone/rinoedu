@@ -290,7 +290,6 @@ function App() {
             <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ml-0 relative ${isSidebarOpen ? 'md:ml-[72px]' : 'md:ml-0'}`}>
                 {/* HEADER */}
                 <Header
-                    currentUser={currentUser}
                     currentApp={currentApp}
                     isDarkMode={isDarkMode}
                     setShowGlobalSearch={setShowGlobalSearch}
@@ -347,7 +346,6 @@ function App() {
                     <div className="animate-fadeIn w-full h-full">
                         {activeModuleId === 'dashboard' ? (
                             <Dashboard
-                                currentUser={currentUser}
                                 dailyFocus={dailyFocus}
                                 handleFocusChange={handleFocusChange}
                                 handleFocusKeyDown={handleFocusKeyDown}
