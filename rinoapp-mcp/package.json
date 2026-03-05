@@ -1,0 +1,14 @@
+{
+    "name": "rinoapp-mcp",
+    "version": "1.0.0",
+    "description": "Cloudflare MCP Server for Rinoapp",
+    "main": "src/index.js",
+    "scripts": {
+        "start": "wrangler dev",
+        "deploy": "wrangler deploy"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "wrangler": "^3.0.0"
+    }
+}

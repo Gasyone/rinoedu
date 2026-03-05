@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Binary & Installer
+*.exe
+*.msi
+cloudflared.exe
+node_installer.msi
+
+# Cloudflare
+.wrangler/
+
+# Gemini AI
+.gemini/

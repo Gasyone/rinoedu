@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RinoEdu - OS</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./tailwind.config.js"></script>
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for in-browser JSX support -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="./src/assets/styles.css">
+</head>
+
+<body
+    class="bg-[#f8fafc] text-slate-800 font-sans overflow-hidden antialiased selection:bg-blue-100 selection:text-blue-900 transition-colors duration-300 dark:bg-[#0f172a] dark:text-slate-100">
+    <div id="root"></div>
+
+    <!-- Application Scripts -->
+    <!-- API Modules -->
+    <script src="src/api/ai.js"></script>
+
+    <!-- UTILS: Icons, i18n, Mock Data -->
+    <script type="text/babel" src="src/utils/icons.jsx"></script>
+    <script src="src/utils/i18n.js"></script>
+    <script type="text/babel" src="src/utils/data.jsx"></script>
+
+    <!-- LAYOUTS -->
+    <script type="text/babel" src="src/layouts/WorkspaceLoader.jsx"></script>
+
+    <!-- COMPONENTS -->
+    <script type="text/babel" src="src/components/PaymentModal.jsx"></script>
+    <script type="text/babel" src="src/components/Sidebar.jsx"></script>
+    <script type="text/babel" src="src/components/Header.jsx"></script>
+    <script type="text/babel" src="src/components/AppLauncher.jsx"></script>
+    <script type="text/babel" src="src/components/GlobalSearch.jsx"></script>
+    <script type="text/babel" src="src/components/UserMenu.jsx"></script>
+    <script type="text/babel" src="src/components/SocialFeed.jsx"></script>
+
+    <!-- PAGES -->
+    <script type="text/babel" src="src/pages/Dashboard.jsx"></script>
+    <script type="text/babel" src="src/pages/SquareHomepage.jsx"></script>
+    <script type="text/babel" src="src/pages/LoginWebapp.jsx"></script>
+
+    <!-- MODULES -->
+    <script type="text/babel" src="src/modules/account/AccountSettings.jsx"></script>
+    <script type="text/babel" src="src/modules/account/AccountSecurity.jsx"></script>
+    <script type="text/babel" src="src/modules/account/AccountProfile.jsx"></script>
+    <script type="text/babel" src="src/modules/account/AccountManager.jsx"></script>
+    <script type="text/babel" src="src/modules/class_management/ClassManager.jsx"></script>
+    <script type="text/babel" src="src/modules/center_ops/CenterOps.jsx"></script>
+
+    <!-- MAIN APP ENTRY -->
+    <script type="text/babel" src="./src/app.jsx"></script>
+</body>
+
+</html>

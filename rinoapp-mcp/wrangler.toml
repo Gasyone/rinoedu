@@ -1,0 +1,13 @@
+name = "rinoapp-mcp"
+main = "src/index.js"
+compatibility_date = "2024-03-05"
+
+# The Account ID obtained dynamically
+account_id = "eb59b0246a147814cfe33c96f6ea5607"
+
+routes = [
+  { pattern = "rinoapp-mcp.gasy.one", custom_domain = true }
+]
+
+[ai]
+binding = "AI"
