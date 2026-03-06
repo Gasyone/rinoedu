@@ -40,8 +40,19 @@ try {
                 $response.Close()
             }
         } else {
-            $response.StatusCode = 404
-            $response.Close()
+            # SPA Fallback: serve index.html for any path not found
+            $indexPath = Join-Path $PWD.Path "index.html"
+            if (Test-Path $indexPath -PathType Leaf) {
+                $content = [System.IO.File]::ReadAllBytes($indexPath)
+                $response.ContentLength64 = $content.Length
+                $response.ContentType = "text/html; charset=utf-8"
+                $output = $response.OutputStream
+                $output.Write($content, 0, $content.Length)
+                $output.Close()
+            } else {
+                $response.StatusCode = 404
+                $response.Close()
+            }
         }
     }
 } finally {

@@ -113,4 +113,9 @@ window.Icons = {
     Key: (p) => <Icon {...p}><path d="m21 2-2 2m-7.6 7.6a6 6 0 1 1-3.4-9.4l11 11h-4v4h4v-4h2v-2l-2-2" /></Icon>,
     Lock: (p) => <Icon {...p}><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></Icon>,
     QrCode: (p) => <Icon {...p}><rect width="5" height="5" x="3" y="3" rx="1" /><rect width="5" height="5" x="16" y="3" rx="1" /><rect width="5" height="5" x="3" y="16" rx="1" /><path d="M21 16h-3a2 2 0 0 0-2 2v3" /><path d="M21 21v.01" /><path d="M12 7v3a2 2 0 0 1-2 2H7" /><path d="M3 12h.01" /><path d="M12 3h.01" /><path d="M12 16v.01" /><path d="M16 12h1" /><path d="M21 12v.01" /><path d="M12 21v-1" /></Icon>,
+    ChevronRight: (p) => <Icon {...p}><polyline points="9 18 15 12 9 6" /></Icon>,
+    ChevronLeft: (p) => <Icon {...p}><polyline points="15 18 9 12 15 6" /></Icon>,
+    Terminal: (p) => <Icon {...p}><polyline points="4 17 10 11 4 5" /><line x1="12" x2="20" y1="19" y2="19" /></Icon>,
+    Bot: (p) => <Icon {...p}><rect width="18" height="14" x="3" y="7" rx="2" ry="2" /><path d="M12 7V3" /><path d="M12 3c-1.6 0-3 1.4-3 3" /><circle cx="9" cy="13" r="1.5" /><circle cx="15" cy="13" r="1.5" /></Icon>,
+    Copy: (p) => <Icon {...p}><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></Icon>,
 };

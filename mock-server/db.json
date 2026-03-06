@@ -1,0 +1,173 @@
+{
+    "whitedoc": [
+        {
+            "id": 1,
+            "title": "Hướng dẫn Quản lý Học viên",
+            "slug": "huong-dan-quan-ly-hoc-vien",
+            "category": "Hướng dẫn sử dụng",
+            "content": "<h1>Quản lý Học viên</h1><p>Để thêm học viên mới, hãy vào mục Quản lý chung và nhấn nút Thêm Học viên.</p>",
+            "roles": [
+                "admin",
+                "teacher"
+            ],
+            "updatedAt": "2026-03-05T10:00:00Z"
+        },
+        {
+            "id": 2,
+            "title": "Quy trình điểm danh bù",
+            "slug": "quy-trinh-diem-danh-bu",
+            "category": "Nghiệp vụ Giáo viên",
+            "content": "<h1>Điểm danh bù</h1><p>Khi học viên học bù ở lớp khác, giáo viên lớp đó cần vào mục Điểm danh học viên học bù và chọn tên học viên.</p>",
+            "roles": [
+                "teacher"
+            ],
+            "updatedAt": "2026-03-02T14:30:00Z"
+        },
+        {
+            "id": 3,
+            "title": "Chính sách học phí và hoàn phí",
+            "slug": "chinh-sach-hoc-phi",
+            "category": "Quy định tài chính",
+            "content": "<h1>Chính sách Học phí</h1><p>Trung tâm không hoàn trả học phí đã đóng trừ trường hợp có giấy chứng nhận sức khỏe không đảm bảo việc học.</p>",
+            "roles": [
+                "admin",
+                "staff",
+                "student"
+            ],
+            "updatedAt": "2026-01-15T09:00:00Z"
+        }
+    ],
+    "students": [
+        {
+            "id": "ST1001",
+            "fullName": "Nguyễn Văn An",
+            "dob": "2010-05-12",
+            "gender": "male",
+            "email": "an.nguyen@example.com",
+            "phone": "0901234567",
+            "status": "active",
+            "enrolledDate": "2025-08-01",
+            "currentClasses": [
+                "IELTS-A-01",
+                "COMM-B-02"
+            ],
+            "feeStatus": "paid"
+        },
+        {
+            "id": "ST1002",
+            "fullName": "Trần Thị Bích",
+            "dob": "2012-08-20",
+            "gender": "female",
+            "email": "bich.tran@example.com",
+            "phone": "0987654321",
+            "status": "active",
+            "enrolledDate": "2026-01-10",
+            "currentClasses": [
+                "IELTS-A-01"
+            ],
+            "feeStatus": "pending"
+        },
+        {
+            "id": "ST1003",
+            "fullName": "Lê Hoàng Cường",
+            "dob": "2009-11-05",
+            "gender": "male",
+            "email": "cuong.le@example.com",
+            "phone": "0912345678",
+            "status": "suspended",
+            "enrolledDate": "2024-05-15",
+            "currentClasses": [],
+            "feeStatus": "overdue"
+        }
+    ],
+    "classes": [
+        {
+            "id": "IELTS-A-01",
+            "name": "IELTS Foundation A01",
+            "level": "Foundation",
+            "teacherId": "TC001",
+            "schedule": "Mon-Wed-Fri 18:00-19:30",
+            "room": "Room 101",
+            "startDate": "2026-01-15",
+            "endDate": "2026-06-15",
+            "status": "in-progress",
+            "studentsCount": 15
+        },
+        {
+            "id": "COMM-B-02",
+            "name": "Giao tiếp Cơ bản B02",
+            "level": "Basic",
+            "teacherId": "TC002",
+            "schedule": "Tue-Thu 19:30-21:00",
+            "room": "Room 205",
+            "startDate": "2026-02-01",
+            "endDate": "2026-05-01",
+            "status": "in-progress",
+            "studentsCount": 12
+        },
+        {
+            "id": "IELTS-M-05",
+            "name": "IELTS Master 05",
+            "level": "Master",
+            "teacherId": "TC001",
+            "schedule": "Sat-Sun 09:00-11:00",
+            "room": "Room 302",
+            "startDate": "2026-04-01",
+            "endDate": "2026-09-01",
+            "status": "upcoming",
+            "studentsCount": 0
+        }
+    ],
+    "teachers": [
+        {
+            "id": "TC001",
+            "fullName": "Phạm Minh Tâm",
+            "email": "tam.pham@rinoedu.example",
+            "phone": "0999888777",
+            "subjects": [
+                "IELTS",
+                "TOEFL"
+            ],
+            "type": "full-time",
+            "status": "active"
+        },
+        {
+            "id": "TC002",
+            "fullName": "Hoàng Tuyết Nhung",
+            "email": "nhung.hoang@rinoedu.example",
+            "phone": "0977666555",
+            "subjects": [
+                "Communication",
+                "Kids"
+            ],
+            "type": "part-time",
+            "status": "active"
+        }
+    ],
+    "payments": [
+        {
+            "id": "PAY-1001",
+            "studentId": "ST1001",
+            "amount": 5000000,
+            "date": "2026-01-10T08:30:00Z",
+            "method": "bank_transfer",
+            "status": "completed",
+            "note": "Học phí IELTS Foundation"
+        },
+        {
+            "id": "PAY-1002",
+            "studentId": "ST1002",
+            "amount": 2500000,
+            "date": "2026-02-15T14:20:00Z",
+            "method": "cash",
+            "status": "pending",
+            "note": "Học phí Giao tiếp đợt 1"
+        }
+    ],
+    "dashboard_stats": {
+        "totalStudents": 156,
+        "activeClasses": 24,
+        "monthlyRevenue": 450000000,
+        "attendanceRate": 92.5
+    }
+}

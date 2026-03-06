@@ -1,0 +1,89 @@
+{
+  "RegisterParamsDto": {
+    "type": "object",
+    "properties": {
+      "email": {
+        "type": "string",
+        "maxLength": 254,
+        "format": "email",
+        "pattern": "/^[\\x00-\\x7F]+$/",
+        "example": "aaa@testmail.com",
+        "description": "Email hợp lệ, tối đa 254 ký tự"
+      },
+      "password": {
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 64,
+        "pattern": "/^[\\x00-\\x7F]+$/",
+        "example": "Abcd@1234"
+      },
+      "key": {
+        "type": "string",
+        "minLength": 20,
+        "maxLength": 20,
+        "example": "cd1AOxF80tokyuhgt654",
+        "description": "ID appllication"
+      },
+      "platform": {
+        "type": "object",
+        "maxLength": 3,
+        "example": "WEB"
+      }
+    },
+    "required": [
+      "email",
+      "password",
+      "key",
+      "platform"
+    ]
+  },
+  "SendForgotPasswordCodeDto": {
+    "type": "object",
+    "properties": {
+      "email": {
+        "type": "string",
+        "format": "email"
+      },
+      "key": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "email",
+      "key"
+    ]
+  },
+  "VerifyForgotPasswordCodeDto": {
+    "type": "object",
+    "properties": {
+      "email": {
+        "type": "string",
+        "format": "email"
+      },
+      "code": {
+        "type": "string",
+        "minLength": 6,
+        "maxLength": 6
+      }
+    },
+    "required": [
+      "email",
+      "code"
+    ]
+  },
+  "ResetPasswordWithTokenDto": {
+    "type": "object",
+    "properties": {
+      "resetToken": {
+        "type": "string"
+      },
+      "newPassword": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "resetToken",
+      "newPassword"
+    ]
+  }
+}

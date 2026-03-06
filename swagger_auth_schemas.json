@@ -1,0 +1,113 @@
+{
+  "AuthRequestDto": {
+    "type": "object",
+    "properties": {
+      "token": {
+        "type": "string"
+      }
+    }
+  },
+  "AuthResponseDto": {
+    "type": "object",
+    "properties": {
+      "error": {
+        "type": "boolean",
+        "example": false
+      },
+      "statusCode": {
+        "type": "number",
+        "example": 200
+      },
+      "message": {
+        "type": "string",
+        "example": "Login success"
+      },
+      "data": {
+        "$ref": "#/components/schemas/UserAuthDto"
+      },
+      "errorCode": {
+        "type": "string",
+        "default": "SUCCESS"
+      },
+      "pagination": {
+        "nullable": true,
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        ]
+      },
+      "key": {
+        "type": "string",
+        "example": "SUCCESS"
+      }
+    },
+    "required": [
+      "key"
+    ]
+  },
+  "RegisterRequest": null,
+  "ForgotPasswordRequest": null,
+  "RelatedPaths": {
+    "/api/v1/orders/payment/multiple/checkout/resend-code": {
+      "post": {
+        "operationId": "MultipleOrderPaymentController_resendCheckoutCode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MultipleCheckoutOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Gửi lại mã xác nhận checkout",
+        "tags": [
+          "Multiple Order Payment"
+        ]
+      }
+    },
+    "/api/v1/admin/wallets/resend-code": {
+      "post": {
+        "operationId": "WalletAdminController_resendAddPointCode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendAddPointCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Admin: Resend code to user's wallet",
+        "tags": [
+          "Wallet Admin"
+        ]
+      }
+    }
+  }
+}

@@ -2,22 +2,23 @@
 const { useState, useMemo, useEffect, useRef } = React;
 const {
     PaymentModal, Header, Sidebar,
-    AppLauncher, GlobalSearch, UserMenu, Dashboard, SocialFeed, AccountManager, LoginWebapp
+    AppLauncher, GlobalSearch, UserMenu, Dashboard, SocialFeed, AccountManager, LoginWebapp, DevAISidebar
 } = window.Components;
+
 
 const { Menu, Home, Plus } = window.Icons;
 const { ALL_APP_LIBRARY, WORK_LOCATIONS, NOTIFICATIONS_MOCK } = window.Data;
 
 function App() {
     // --- STATE ---
-    const [myAppIds, setMyAppIds] = useState(['dashboard', 'social', 'chat', 'work', 'directory', 'wallet']);
-    const [pinnedAppIds, setPinnedAppIds] = useState(['dashboard', 'social', 'chat', 'work', 'directory', 'wallet']);
+    const [myAppIds, setMyAppIds] = useState(['square_home', 'dashboard', 'social', 'chat', 'work', 'directory', 'wallet']);
+    const [pinnedAppIds, setPinnedAppIds] = useState(['square_home', 'dashboard', 'social', 'chat', 'work', 'directory', 'wallet']);
     const [activeModuleId, setActiveModuleId] = useState('dashboard');
 
-    // Mobile: Sidebar closed by default
     const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
     const [showAppLauncher, setShowAppLauncher] = useState(false);
     const [showGlobalSearch, setShowGlobalSearch] = useState(false);
+    const [isDevAIOpen, setIsDevAIOpen] = useState(false); // New state for AI Sidebar toggle
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
     const [currentView, setCurrentView] = useState('square'); // 'square' | 'login' | 'workspace'
@@ -25,19 +26,73 @@ function App() {
 
     // Initial Loading Effect
     useEffect(() => {
-        // Intercept Keycloak or SSO redirect success
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('auth') === 'success') {
-            setIsAuthenticated(true);
-            setCurrentView('square');
+        const initAuth = async () => {
+            // Check stored session
+            const sessionStr = localStorage.getItem('rino_auth_session');
+            const tokenStr = localStorage.getItem('rino_auth_token');
+            let hasValidToken = false;
+            let activeToken = null;
 
-            // Clean up the URL
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
+            if (sessionStr) {
+                try {
+                    const session = JSON.parse(sessionStr);
+                    if (session.expiry && Date.now() > session.expiry) {
+                        localStorage.removeItem('rino_auth_session');
+                    } else {
+                        hasValidToken = !!session.token;
+                        activeToken = session.token;
+                    }
+                } catch (e) {
+                    localStorage.removeItem('rino_auth_session');
+                }
+            } else if (tokenStr) {
+                hasValidToken = true;
+                activeToken = tokenStr;
+            }
 
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 1000);
+            if (hasValidToken && activeToken) {
+                // Fetch user profile based on token if needed, or bypass explicitly
+                // Here we just mock the authenticated state or restore simple profile
+                const savedUserStr = localStorage.getItem('rino_user_profile');
+                if (savedUserStr) {
+                    try {
+                        setCurrentUser(JSON.parse(savedUserStr));
+                    } catch (e) { }
+                } else {
+                    setCurrentUser({ name: 'Member', email: 'user@rinoedu.com' });
+                }
+                setIsAuthenticated(true);
+
+                // Deep link support based on initial URL
+                const path = window.location.pathname.substring(1);
+                if (path && path !== 'home' && window.Data.ALL_APP_LIBRARY[path]) {
+                    setActiveModuleId(path);
+                    setCurrentView('workspace');
+                } else {
+                    setCurrentView('square');
+                }
+            }
+
+            // Intercept Keycloak or SSO redirect success
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('code')) {
+                // Return from Google OAuth callback -> Let LoginWebapp handle it
+                setIsAuthenticated(false);
+                setCurrentView('login');
+            } else if (params.get('auth') === 'success') {
+                setIsAuthenticated(true);
+                setCurrentView('square');
+
+                // Clean up the URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            setTimeout(() => {
+                setIsLoading(false);
+            }, 500);
+        };
+
+        initAuth();
     }, []);
 
     const [showNotifications, setShowNotifications] = useState(false);
@@ -98,6 +153,22 @@ function App() {
         else document.documentElement.classList.remove('dark');
     }, [isDarkMode]);
 
+    // Sync URL with current view/module
+    useEffect(() => {
+        if (!isAuthenticated && currentView === 'login') return;
+
+        let path = '/';
+        if (currentView === 'workspace') {
+            path = `/${activeModuleId}`;
+        } else if (currentView === 'square') {
+            path = '/home';
+        }
+
+        if (window.location.pathname !== path) {
+            window.history.replaceState({}, '', path);
+        }
+    }, [currentView, activeModuleId, isAuthenticated]);
+
     // --- ACTIONS ---
     const togglePinApp = (e, appId) => {
         e.stopPropagation();
@@ -136,11 +207,16 @@ function App() {
 
     const handleOpenApp = (moduleId) => {
         if (!myAppIds.includes(moduleId)) setMyAppIds(prev => [...prev, moduleId]);
-        setActiveModuleId(moduleId);
         setShowAppLauncher(false);
         setShowGlobalSearch(false);
         setShowUserMenu(false);
         if (window.innerWidth <= 768) setIsSidebarOpen(false); // Close sidebar on mobile after click
+
+        if (moduleId === 'square_home') {
+            setCurrentView('square');
+        } else {
+            setActiveModuleId(moduleId);
+        }
     };
 
 
@@ -194,11 +270,17 @@ function App() {
                     currentUser={currentUser}
                     onNavigateLogin={() => setCurrentView('login')}
                     onNavigateDashboard={() => { setCurrentView('workspace'); setActiveModuleId('dashboard'); }}
-                    onLogout={() => { setIsAuthenticated(false); setCurrentView('square'); }}
-                    showUserMenu={showUserMenu}
-                    setShowUserMenu={setShowUserMenu}
+                    onLogout={() => {
+                        localStorage.removeItem('rino_auth_session');
+                        localStorage.removeItem('rino_auth_token');
+                        localStorage.removeItem('rino_user_profile');
+                        setIsAuthenticated(false);
+                        setCurrentView('square');
+                    }}
                     showAppLauncher={showAppLauncher}
                     setShowAppLauncher={setShowAppLauncher}
+                    isDevAIOpen={isDevAIOpen}
+                    setIsDevAIOpen={setIsDevAIOpen}
                 />
 
                 {/* Re-using the same global menus on top of the SquareHomepage */}
@@ -217,7 +299,15 @@ function App() {
                         setWorkLocation={setWorkLocation}
                         showLocationModal={showLocationModal}
                         setShowLocationModal={setShowLocationModal}
-                        onLogout={() => { setIsAuthenticated(false); setCurrentUser(null); setShowUserMenu(false); setCurrentView('square'); }}
+                        onLogout={() => {
+                            localStorage.removeItem('rino_auth_session');
+                            localStorage.removeItem('rino_auth_token');
+                            localStorage.removeItem('rino_user_profile');
+                            setIsAuthenticated(false);
+                            setCurrentUser(null);
+                            setShowUserMenu(false);
+                            setCurrentView('square');
+                        }}
                         setShowSettingsModal={setShowSettingsModal}
                         workStatus={workStatus}
                         setWorkStatus={setWorkStatus}
@@ -225,6 +315,8 @@ function App() {
                             handleOpenApp(id);
                             setCurrentView('workspace');
                         }}
+                        isDevAIOpen={isDevAIOpen}
+                        setIsDevAIOpen={setIsDevAIOpen}
                     />
                 )}
                 {showAppLauncher && isAuthenticated && (
@@ -248,6 +340,8 @@ function App() {
                     />
                 )}
 
+                {/* Dev AI Sidebar Overlay */}
+                {isAuthenticated && <DevAISidebar isDarkMode={isDarkMode} isDevAIOpen={isDevAIOpen} setIsDevAIOpen={setIsDevAIOpen} />}
             </div>
         );
     }
@@ -263,7 +357,7 @@ function App() {
     }
 
     return (
-        <div className="flex h-screen w-full" onClick={() => { setShowUserMenu(false); setShowSettingsModal(false); setShowLocationModal(false); setShowNotifications(false); }}>
+        <div className="flex h-screen w-full" onClick={() => { setShowUserMenu(false); setShowSettingsModal(false); setShowLocationModal(false); setShowNotifications(false); setShowAppLauncher(false); }}>
 
             {/* LOADERS & PAYMENT MODAL */}
             <PaymentModal
@@ -287,7 +381,7 @@ function App() {
             />
 
             {/* MAIN AREA */}
-            <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ml-0 relative ${isSidebarOpen ? 'md:ml-[72px]' : 'md:ml-0'}`}>
+            <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ml-0 relative overflow-y-auto overflow-x-hidden ${isSidebarOpen ? 'md:ml-[72px]' : 'md:ml-0'}`}>
                 {/* HEADER */}
                 <Header
                     currentUser={currentUser}
@@ -302,11 +396,11 @@ function App() {
                     setShowSettingsModal={setShowSettingsModal}
                     setShowLocationModal={setShowLocationModal}
                     groupedNotifications={groupedNotifications}
-                    notifFilter={notifFilter}
-                    setNotifFilter={setNotifFilter}
                     markAsRead={markAsRead}
                     markAllAsRead={markAllAsRead}
                     notifications={notifications}
+                    isDevAIOpen={isDevAIOpen}
+                    setIsDevAIOpen={setIsDevAIOpen}
                 />
 
                 {/* MOBILE HORIZONTAL APP NAVIGATION (Below Header) */}
@@ -343,7 +437,7 @@ function App() {
                 </div>
 
                 {/* CONTENT */}
-                <main className={`flex-1 overflow-y-auto relative ${activeModuleId === 'dashboard' || activeModuleId === 'social' || activeModuleId === 'wallet' ? (isExpandedMode ? 'w-full max-w-full px-4 md:px-8 py-4 md:py-6 lg:py-8' : 'w-full max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6 lg:py-8') : 'w-full h-full'}`}>
+                <main className={`flex-1 relative ${activeModuleId === 'dashboard' || activeModuleId === 'social' || activeModuleId === 'wallet' ? (isExpandedMode ? 'w-full max-w-full px-4 md:px-8 py-4 md:py-6 lg:py-8' : 'w-full max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6 lg:py-8') : 'w-full h-full'}`}>
                     <div className="animate-fadeIn w-full h-full">
                         {activeModuleId === 'dashboard' ? (
                             <Dashboard
@@ -365,11 +459,11 @@ function App() {
                                 isExpandedMode={isExpandedMode}
                                 setIsExpandedMode={setIsExpandedMode}
                             />
-                        ) : activeModuleId === 'center_ops' ? (
+                        ) : activeModuleId === 'hr' ? (
                             <window.CenterOps
                                 isDarkMode={isDarkMode}
                             />
-                        ) : activeModuleId === 'class_management' ? (
+                        ) : activeModuleId === 'education' ? (
                             <window.ClassManager
                                 isDarkMode={isDarkMode}
                             />
@@ -439,8 +533,17 @@ function App() {
                 showSettingsModal={showSettingsModal}
                 setShowSettingsModal={setShowSettingsModal}
                 onOpenApp={handleOpenApp}
-                onLogout={() => { setIsAuthenticated(false); setCurrentUser(null); setCurrentView('square'); }}
+                onLogout={() => {
+                    localStorage.removeItem('rino_auth_session');
+                    localStorage.removeItem('rino_auth_token');
+                    localStorage.removeItem('rino_user_profile');
+                    setIsAuthenticated(false);
+                    setCurrentUser(null);
+                    setCurrentView('square');
+                }}
                 currentUser={currentUser}
+                isDevAIOpen={isDevAIOpen}
+                setIsDevAIOpen={setIsDevAIOpen}
             />
 
             {/* Render Modals as Bottom Sheets ONLY on Mobile */}
@@ -492,6 +595,9 @@ function App() {
                     </div>
                 )}
             </div>
+
+            {/* Dev AI Sidebar Overlay */}
+            <DevAISidebar isDarkMode={isDarkMode} isDevAIOpen={isDevAIOpen} setIsDevAIOpen={setIsDevAIOpen} />
 
             {/* Hover Tooltip */}
             {hoverTooltip && (

@@ -18,6 +18,8 @@
 
     <!-- Custom Styles -->
     <link rel="stylesheet" href="./src/assets/styles.css">
+    <!-- Design Tokens (Single Source of Truth for all colors, spacing, fonts) -->
+    <link rel="stylesheet" href="./src/shared/design-tokens.css">
 </head>
 
 <body
@@ -44,6 +46,7 @@
     <script type="text/babel" src="src/components/GlobalSearch.jsx"></script>
     <script type="text/babel" src="src/components/UserMenu.jsx"></script>
     <script type="text/babel" src="src/components/SocialFeed.jsx"></script>
+    <script type="text/babel" src="src/components/DevAISidebar.jsx"></script>
 
     <!-- PAGES -->
     <script type="text/babel" src="src/pages/Dashboard.jsx"></script>
@@ -51,12 +54,15 @@
     <script type="text/babel" src="src/pages/LoginWebapp.jsx"></script>
 
     <!-- MODULES -->
-    <script type="text/babel" src="src/modules/account/AccountSettings.jsx"></script>
-    <script type="text/babel" src="src/modules/account/AccountSecurity.jsx"></script>
-    <script type="text/babel" src="src/modules/account/AccountProfile.jsx"></script>
-    <script type="text/babel" src="src/modules/account/AccountManager.jsx"></script>
-    <script type="text/babel" src="src/modules/class_management/ClassManager.jsx"></script>
-    <script type="text/babel" src="src/modules/center_ops/CenterOps.jsx"></script>
+    <!-- IAM: Identity & Access Management (formerly: account) -->
+    <script type="text/babel" src="src/modules/iam/AccountSettings.jsx"></script>
+    <script type="text/babel" src="src/modules/iam/AccountSecurity.jsx"></script>
+    <script type="text/babel" src="src/modules/iam/AccountProfile.jsx"></script>
+    <script type="text/babel" src="src/modules/iam/AccountManager.jsx"></script>
+    <!-- EDUCATION: Class Management (formerly: class_management) -->
+    <script type="text/babel" src="src/modules/education/ClassManager.jsx"></script>
+    <!-- HR: Center Operations (formerly: center_ops) -->
+    <script type="text/babel" src="src/modules/hr/CenterOps.jsx"></script>
 
     <!-- MAIN APP ENTRY -->
     <script type="text/babel" src="./src/app.jsx"></script>

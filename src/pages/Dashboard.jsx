@@ -11,10 +11,7 @@ window.Components.Dashboard = ({
         <div className="space-y-6 animate-slide-up pb-24 md:pb-10 w-full animate-fadeIn">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 w-full">
                 <div className="md:col-span-8 rounded-3xl p-6 md:p-8 bg-white dark:bg-slate-800 shadow-card border border-slate-100 dark:border-slate-700 flex flex-col justify-center">
-                    <div className="flex items-center gap-3 mb-2">
-                        <span className="text-2xl">👋</span>
-                        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">{getGreeting()}, {currentUser?.name || 'bạn'}!</h2>
-                    </div>
+                    <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">{getGreeting()}!</h2>
                     <div className="mt-4">
                         <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Tâm điểm hôm nay</label>
                         <div className="flex items-center gap-3 relative z-10 p-1">
@@ -101,6 +98,6 @@ window.Components.Dashboard = ({
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };

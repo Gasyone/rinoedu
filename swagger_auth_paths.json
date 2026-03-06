@@ -1,0 +1,34 @@
+{
+  "/api/v1/users/auth": {
+    "post": {
+      "operationId": "UserController_auth",
+      "parameters": [],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AuthRequestDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthResponseDto"
+              }
+            }
+          }
+        }
+      },
+      "summary": "Authen PSVN",
+      "tags": [
+        "User Management"
+      ]
+    }
+  }
+}

@@ -4,13 +4,17 @@ const { useState, useRef, useEffect } = React;
 window.Components.LoginWebapp = ({ onLoginSuccess }) => {
     const [currentStep, setCurrentStep] = useState('email'); // email, password, otp, setup, success
     const [activeTab, setActiveTab] = useState('email'); // email, qr
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState('hivogprovfu@gmail.com');
     const [isResetFlow, setIsResetFlow] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [countdown, setCountdown] = useState(59);
+    const [rememberMe, setRememberMe] = useState(true);
+    const [isRegisterFlow, setIsRegisterFlow] = useState(false);
+    const [resetToken, setResetToken] = useState('');
+    const [isGoogleFlow, setIsGoogleFlow] = useState(false);
 
     const [emailError, setEmailError] = useState('');
-    const [passInput, setPassInput] = useState('');
+    const [passInput, setPassInput] = useState('Fcn@201710');
     const [passError, setPassError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -35,6 +39,131 @@ window.Components.LoginWebapp = ({ onLoginSuccess }) => {
         return () => clearInterval(timer);
     }, [currentStep, countdown]);
 
+    // Handle Google OAuth callback (when redirected back with ?code=&state=)
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        const state = params.get('state');
+        const sessionState = params.get('session_state');
+
+        if (code && (state || sessionState)) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+
+            (async () => {
+                setIsLoading(true);
+                setIsGoogleFlow(true);
+                try {
+                    const tokenRes = await fetch('https://auth-dev.gasy.one/auth/google/app/token', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ code: code, key: "cd1AOxF80tyFz50qIEfw" })
+                    });
+                    const authData = await tokenRes.json();
+                    if (!tokenRes.ok) throw new Error(authData.message || 'Lỗi đăng nhập Google');
+
+                    const rawToken = authData.data?.accessToken || authData.access_token || authData.token;
+                    if (!rawToken) throw new Error('Không nhận được token từ Google.');
+
+                    const platformRes = await fetch('https://psvn-api-dev.gasy.one/api/v1/users/auth', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token: rawToken })
+                    });
+
+                    if (platformRes.ok) {
+                        const platformData = await platformRes.json();
+                        const finalToken = platformData.data?.token || platformData.token || rawToken;
+
+                        const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
+                        localStorage.setItem('rino_auth_session', JSON.stringify({ token: finalToken, expiry }));
+
+                        const userProfile = platformData.data?.user || authData.data?.user || {
+                            name: authData.data?.name || 'Google User',
+                            email: authData.data?.email || ''
+                        };
+                        localStorage.setItem('rino_user_profile', JSON.stringify(userProfile));
+
+                        if (authData.data?.needCreatePassword || authData.needCreatePassword) {
+                            setEmail(userProfile.email || '');
+                            setIsGoogleFlow(true);
+                            setCurrentStep('setup');
+                        } else {
+                            setCurrentStep('success');
+                            setTimeout(() => onLoginSuccess(userProfile), 1000);
+                        }
+                    } else {
+                        throw new Error('Lỗi xác thực nền tảng.');
+                    }
+                } catch (e) {
+                    setEmailError(`⚠ ${e.message}`);
+                    setCurrentStep('email');
+                } finally {
+                    setIsLoading(false);
+                }
+            })();
+        }
+    }, []);
+
+
+
+    const handleGoogleLogin = async () => {
+        setIsLoading(true);
+        try {
+            const res = await fetch('https://auth-dev.gasy.one/auth/google?key=cd1AOxF80tyFz50qIEfw');
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Không lấy được URL Google');
+
+            const googleUrl = data.data?.url || data.url;
+            if (!googleUrl) throw new Error('URL đăng nhập Google không khả dụng.');
+
+            // Khôi phục popup vì không thể đổi redirect_uri (bị Keycloak chặn)
+            const width = 500, height = 600;
+            const left = window.screenX + (window.outerWidth - width) / 2;
+            const top = window.screenY + (window.outerHeight - height) / 2;
+            const popup = window.open(googleUrl, 'GoogleLogin', `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`);
+
+            if (!popup) {
+                throw new Error('Popup bị chặn. Vui lòng cho phép trình duyệt hiện popup.');
+            }
+
+            const pollTimer = setInterval(() => {
+                try {
+                    if (popup.closed) {
+                        clearInterval(pollTimer);
+                        setIsLoading(false);
+                        return;
+                    }
+
+                    // CORS có thể ném throw error nếu URL thay đổi sang domain khác
+                    // Nhưng khi quay về auth-dev.gasy.one/auth/google/callback, ta sẽ bắt được url (vì popup cùng origin window.location.origin? KO, web rinoedu.pages.dev khác auth-dev.gasy.one!)
+                    // Việc đọc popup.location.href của domain khác VẪN SẼ LỖI CORS BLOCK!
+                    // Nên duy nhất để backend redirect về frontend, frontend DẸP popup, dùng window.location.href.
+                    // NHƯNG nếu window.location.href với cái URL gốc (không can thiệp redirect_uri) ->
+                    // user sẽ bị đá sang auth-dev.gasy.one/auth/google/callback và KHÔNG ĐƯỢC CHUYỂN VỀ RINOEDU (nếu backend đang bị lỗi 500).
+
+                    const popupUrl = popup.location.href;
+                    if (popupUrl && popupUrl.includes('/auth/google/callback')) {
+                        clearInterval(pollTimer);
+                        const popupParams = new URL(popupUrl).searchParams;
+                        const code = popupParams.get('code');
+                        popup.close();
+
+                        if (code) {
+                            // Chuyển việc gọi API lấy token cho useEffect ở trên bằng cách reload kèm mã code
+                            window.location.href = `/?code=${code}`;
+                        }
+                    }
+                } catch (e) {
+                    // cross-origin error (bỏ qua)
+                }
+            }, 500);
+
+        } catch (e) {
+            setEmailError(`⚠ ${e.message}`);
+            setIsLoading(false);
+        }
+    };
+
     const showLoading = (callback) => {
         setIsLoading(true);
         setTimeout(() => {
@@ -43,16 +172,41 @@ window.Components.LoginWebapp = ({ onLoginSuccess }) => {
         }, 800);
     };
 
-    const handleCheckEmail = () => {
+    const handleCheckEmail = async () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!email.trim()) { setEmailError('⚠ Vui lòng nhập email.'); return; }
         if (!emailRegex.test(email.trim())) { setEmailError('⚠ Email không đúng định dạng (VD: abc@gasy.vn)'); return; }
 
         setEmailError('');
         setIsResetFlow(false);
-        showLoading(() => {
+        setIsRegisterFlow(false);
+        setIsLoading(true);
+
+        // Dummy login to check existence without sending OTP (if send-code is used it will spam users)
+        try {
+            const checkRes = await fetch('https://auth-dev.gasy.one/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, password: "dummy_check", key: "cd1AOxF80tyFz50qIEfw" })
+            });
+
+            const data = await checkRes.json();
+
+            // 404/Not Found typically means user does not exist -> Register Flow
+            // If it says "người dùng không tồn tại" or similar
+            if (data.message && data.message.toLowerCase().includes('không tồn tại')) {
+                setIsRegisterFlow(true);
+                setCurrentStep('setup');
+            } else {
+                // Exists (401 Wrong password, etc)
+                setCurrentStep('password');
+            }
+        } catch (err) {
+            // Default fallback
             setCurrentStep('password');
-        });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleLoginPassword = async () => {
@@ -96,13 +250,20 @@ window.Components.LoginWebapp = ({ onLoginSuccess }) => {
             const finalToken = platformData.data?.token || platformData.token || rawToken;
 
             // Step 3: Save and proceed
-            localStorage.setItem('rino_auth_token', finalToken);
+            if (rememberMe) {
+                const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
+                localStorage.setItem('rino_auth_session', JSON.stringify({ token: finalToken, expiry }));
+            } else {
+                localStorage.setItem('rino_auth_token', finalToken); // session only or simple fallback
+            }
+
             setCurrentStep('success');
 
             const userProfile = platformData.data?.user || authData.data?.user || {
                 name: authData.data?.name || platformData.data?.name || email.split('@')[0],
                 email: email
             };
+            localStorage.setItem('rino_user_profile', JSON.stringify(userProfile));
 
             setTimeout(() => {
                 setIsLoading(false);
@@ -115,9 +276,24 @@ window.Components.LoginWebapp = ({ onLoginSuccess }) => {
         }
     };
 
-    const handleForgotPass = () => {
+    const handleForgotPass = async () => {
         setIsResetFlow(true);
-        setCurrentStep('otp');
+        setIsLoading(true);
+        try {
+            const res = await fetch('https://auth-dev.gasy.one/auth/app/forgot-password/send-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, key: "cd1AOxF80tyFz50qIEfw" })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Lỗi gửi mã OTP');
+            setCurrentStep('otp');
+            setCountdown(59);
+        } catch (e) {
+            setPassError(`⚠ ${e.message}`);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleOtpChange = (index, value) => {
@@ -129,15 +305,47 @@ window.Components.LoginWebapp = ({ onLoginSuccess }) => {
         }
     };
 
-    const handleValidateOTP = () => {
-        if (otp.join('').length < 6) { setOtpError('⚠ Vui lòng nhập đủ 6 số OTP.'); return; }
+    const handleValidateOTP = async () => {
+        const enteredOtp = otp.join('');
+        if (enteredOtp.length < 6) { setOtpError('⚠ Vui lòng nhập đủ 6 số OTP.'); return; }
         setOtpError('');
-        showLoading(() => { setCurrentStep('setup'); });
+
+        if (isResetFlow) {
+            setIsLoading(true);
+            try {
+                const res = await fetch('https://auth-dev.gasy.one/auth/app/forgot-password/verify-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, code: enteredOtp })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Mã OTP không hợp lệ hoặc đã hết hạn.');
+
+                // Assuming verify-code returns a resetToken
+                if (data.data && data.data.resetToken) {
+                    setResetToken(data.data.resetToken);
+                } else if (data.resetToken) {
+                    setResetToken(data.resetToken);
+                } else {
+                    // Fallback using otp directly if backend allows
+                    setResetToken(enteredOtp);
+                }
+
+                setCurrentStep('setup');
+            } catch (e) {
+                setOtpError(`⚠ ${e.message}`);
+            } finally {
+                setIsLoading(false);
+            }
+        } else {
+            // Future register OTP flow if needed
+            showLoading(() => { setCurrentStep('setup'); });
+        }
     };
 
-    const handleFinalizeSetup = () => {
+    const handleFinalizeSetup = async () => {
         let valid = true;
-        if (!isResetFlow && !tcChecked) {
+        if (isRegisterFlow && !tcChecked) {
             setTcError('⚠ Bạn phải đồng ý với điều khoản để tiếp tục.');
             valid = false;
         } else { setTcError(''); }
@@ -152,8 +360,121 @@ window.Components.LoginWebapp = ({ onLoginSuccess }) => {
             setSetupError('');
         }
 
-        if (valid) {
-            showLoading(() => { setCurrentStep('success'); setTimeout(onLoginSuccess, 1500); });
+        if (!valid) return;
+
+        setIsLoading(true);
+
+        try {
+            if (isResetFlow) {
+                // Đổi mật khẩu
+                const res = await fetch('https://auth-dev.gasy.one/auth/app/forgot-password/reset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resetToken: resetToken, newPassword: newPass })
+                });
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    throw new Error(data.message || 'Lỗi khi đặt lại mật khẩu.');
+                }
+                // Thành công, tự động đăng nhập hoặc quay lại password
+                setPassInput(newPass);
+                setCurrentStep('password');
+            } else if (isGoogleFlow) {
+                // Tạo mật khẩu cho tài khoản Google
+                const sessionStr = localStorage.getItem('rino_auth_session');
+                let bearerToken = '';
+                if (sessionStr) {
+                    try { bearerToken = JSON.parse(sessionStr).token; } catch (e) { }
+                }
+
+                const res = await fetch('https://auth-dev.gasy.one/auth/create-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${bearerToken}`
+                    },
+                    body: JSON.stringify({ email: email, password: newPass })
+                });
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    throw new Error(data.message || 'Lỗi tạo mật khẩu.');
+                }
+
+                // Thành công - đã có token lưu rồi, vào app luôn
+                const savedProfile = localStorage.getItem('rino_user_profile');
+                const userProfile = savedProfile ? JSON.parse(savedProfile) : { name: email.split('@')[0], email };
+                setCurrentStep('success');
+                setTimeout(() => {
+                    setIsLoading(false);
+                    onLoginSuccess(userProfile);
+                }, 1000);
+                return;
+            } else if (isRegisterFlow) {
+                // Đăng ký mới
+                const res = await fetch('https://auth-dev.gasy.one/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        password: newPass,
+                        key: "cd1AOxF80tyFz50qIEfw",
+                        platform: "WEB"
+                    })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.message || 'Lỗi đăng ký tài khoản.');
+
+                // Đăng ký thành công, tự động tiến hành quy trình lấy Token
+                setPassInput(newPass); // auto fill to let user just click or we login
+                // Login immediately
+                const loginRes = await fetch('https://auth-dev.gasy.one/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, password: newPass, key: "cd1AOxF80tyFz50qIEfw" })
+                });
+
+                if (loginRes.ok) {
+                    const authData = await loginRes.json();
+                    const rawToken = authData.data?.accessToken || authData.access_token || authData.token;
+
+                    const platformRes = await fetch('https://psvn-api-dev.gasy.one/api/v1/users/auth', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token: rawToken })
+                    });
+
+                    if (platformRes.ok) {
+                        const platformData = await platformRes.json();
+                        const finalToken = platformData.data?.token || platformData.token || rawToken;
+
+                        // Save session
+                        if (rememberMe) {
+                            const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
+                            localStorage.setItem('rino_auth_session', JSON.stringify({ token: finalToken, expiry }));
+                        } else {
+                            localStorage.setItem('rino_auth_token', finalToken);
+                        }
+
+                        setCurrentStep('success');
+                        const userProfile = platformData.data?.user || authData.data?.user || {
+                            name: authData.data?.name || email.split('@')[0],
+                            email: email
+                        };
+
+                        setTimeout(() => {
+                            setIsLoading(false);
+                            onLoginSuccess(userProfile);
+                        }, 1000);
+                        return; // Done
+                    }
+                }
+                // Fallback nếu login auto lỗi
+                setCurrentStep('password');
+            }
+        } catch (e) {
+            setSetupError(`⚠ ${e.message}`);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -205,12 +526,10 @@ window.Components.LoginWebapp = ({ onLoginSuccess }) => {
                     {/* Step 1: Email */}
                     {currentStep === 'email' && activeTab === 'email' && (
                         <div className="animate-fade-in">
-                            <div className="space-y-3 mb-8">
-                                <button onClick={() => { setIsResetFlow(false); showLoading(() => setCurrentStep('setup')); }} className="w-full py-3 rounded-lg border border-slate-200 dark:border-slate-700 font-bold flex items-center justify-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-700 transition dark:text-white">
-                                    <span className="font-bold text-blue-500">G</span> Tiếp tục với Google
-                                </button>
-                                <button className="w-full py-3 rounded-lg border border-slate-200 dark:border-slate-700 font-bold flex items-center justify-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-700 transition dark:text-white">
-                                    <span className="font-bold text-blue-600">O</span> Tiếp tục với Outlook
+                            <div className="mb-6">
+                                <button onClick={handleGoogleLogin} disabled={isLoading} className="w-full py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 font-medium flex items-center justify-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition dark:text-white text-sm shadow-sm">
+                                    <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" /><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.08 24.08 0 0 0 0 21.56l7.98-6.19z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /></svg>
+                                    Đăng nhập với Google
                                 </button>
                             </div>
 
@@ -260,7 +579,7 @@ window.Components.LoginWebapp = ({ onLoginSuccess }) => {
 
                                 <div className="flex justify-between items-center text-sm">
                                     <label className="flex items-center gap-2 cursor-pointer dark:text-slate-300">
-                                        <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" /> Ghi nhớ
+                                        <input type="checkbox" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" /> Ghi nhớ 30 ngày
                                     </label>
                                     <button onClick={handleForgotPass} className="font-bold text-blue-600 hover:text-blue-700">Quên mật khẩu?</button>
                                 </div>
@@ -308,8 +627,8 @@ window.Components.LoginWebapp = ({ onLoginSuccess }) => {
                     {/* Step 3: Setup Password / T&C */}
                     {currentStep === 'setup' && (
                         <div className="animate-fade-in">
-                            <h2 className="text-2xl font-bold mb-2 dark:text-white">{isResetFlow ? 'Đặt lại mật khẩu' : 'Thiết lập tài khoản'}</h2>
-                            <p className="text-slate-500 dark:text-slate-400 mb-6">{isResetFlow ? 'Nhập mật khẩu mới để khôi phục quyền truy cập.' : 'Tạo mật khẩu để bảo vệ tài khoản RinoEdu của bạn.'}</p>
+                            <h2 className="text-2xl font-bold mb-2 dark:text-white">{isResetFlow ? 'Đặt lại mật khẩu' : isGoogleFlow ? 'Tạo mật khẩu cho tài khoản Google' : 'Thiết lập tài khoản'}</h2>
+                            <p className="text-slate-500 dark:text-slate-400 mb-6">{isResetFlow ? 'Nhập mật khẩu mới để khôi phục quyền truy cập.' : isGoogleFlow ? 'Bạn đã đăng nhập bằng Google. Tạo mật khẩu để có thể đăng nhập bằng email sau này.' : 'Tạo mật khẩu để bảo vệ tài khoản RinoEdu của bạn.'}</p>
 
                             <div className="space-y-4">
                                 <div>

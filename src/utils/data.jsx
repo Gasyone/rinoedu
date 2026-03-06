@@ -8,7 +8,8 @@ const {
 
 window.Data = {
     ALL_APP_LIBRARY: {
-        dashboard: { id: 'dashboard', name: 'Trang chủ', icon: Home, color: 'text-indigo-600', category: 'Hệ thống', desc: 'Bảng điều khiển tổng quan.', price: 'Free' },
+        square_home: { id: 'square_home', name: 'Trang chính', icon: Globe, color: 'text-indigo-500', category: 'Hệ thống', desc: 'Quay lại màn hình giới thiệu & công cụ mở.', price: 'Free' },
+        dashboard: { id: 'dashboard', name: 'Bảng làm việc', icon: Home, color: 'text-indigo-600', category: 'Hệ thống', desc: 'Bảng điều khiển tổng quan.', price: 'Free' },
         identity_center: { id: 'identity_center', name: 'Identity Center', icon: Fingerprint, color: 'text-rose-600', category: 'Hệ thống', desc: 'Quản lý định danh tập trung.', price: 'Free' },
         account_manager: { id: 'account_manager', name: 'Quản lý tài khoản', icon: User, color: 'text-blue-600', category: 'Hệ thống', desc: 'Hồ sơ, bảo mật & cài đặt chung', price: 'Free' },
         center_ops: { id: 'center_ops', name: 'Quản lý Đào tạo', icon: Building, color: 'text-blue-600', category: 'Vận hành', desc: 'Quản lý đa cơ sở, chương trình và nguồn lực.', price: 'Free' },

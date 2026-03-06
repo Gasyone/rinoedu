@@ -20,7 +20,7 @@ window.Components.Sidebar = ({
             {/* DESKTOP FLOATING TOGGLE BUTTON (When Sidebar Closed) */}
             <button
                 onClick={() => setIsSidebarOpen(true)}
-                className={`fixed bottom-4 left-[-10px] z-50 w-8 h-10 bg-white dark:bg-slate-800 rounded-r-xl border-y border-r border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-md hover:w-10 hover:left-0 transition-all group hidden md:flex ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}
+                className={`fixed top-[152px] left-[-10px] z-50 w-8 h-10 bg-white dark:bg-slate-800 rounded-r-xl border-y border-r border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-md hover:w-10 hover:left-0 transition-all group hidden md:flex ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}
             >
                 <ChevronsRight className="w-5 h-5 text-blue-600" />
             </button>
@@ -29,9 +29,16 @@ window.Components.Sidebar = ({
             <aside className={`fixed inset-y-0 left-0 z-40 bg-white dark:bg-[#111827] border-r border-slate-100 dark:border-slate-800 flex flex-col items-center py-5 transition-transform duration-300 shadow-lg ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} w-[240px] md:w-[72px]`} onClick={e => e.stopPropagation()}>
 
                 {/* Desktop Home Button (Fixed Navigation) */}
-                <div className="mb-6 hidden md:flex">
-                    <button onClick={() => handleOpenApp('dashboard')} className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${activeModuleId === 'dashboard' ? 'bg-blue-600 text-white shadow-glow' : 'bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-600 dark:bg-slate-700 dark:text-slate-300'}`} onMouseEnter={e => setHoverTooltip({ name: "Trang chủ", rect: e.target.getBoundingClientRect() })} onMouseLeave={() => setHoverTooltip(null)}>
+                <div className="mb-2 hidden md:flex flex-col gap-2 w-full px-2">
+                    <button onClick={() => handleOpenApp('dashboard')} className={`w-10 h-10 mx-auto rounded-xl flex items-center justify-center transition-all ${activeModuleId === 'dashboard' ? 'bg-blue-600 text-white shadow-glow' : 'bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-600 dark:bg-slate-700 dark:text-slate-300'}`} onMouseEnter={e => setHoverTooltip({ name: "Trang chủ", rect: e.target.getBoundingClientRect() })} onMouseLeave={() => setHoverTooltip(null)}>
                         <Home className="w-5 h-5" />
+                    </button>
+                    <button onClick={() => setShowAppLauncher(true)} className={`w-10 h-10 mx-auto rounded-xl flex items-center justify-center transition-all text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800`} onMouseEnter={e => setHoverTooltip({ name: "Ứng dụng", rect: e.target.getBoundingClientRect() })} onMouseLeave={() => setHoverTooltip(null)}>
+                        <Grid3x3 className="w-5 h-5" />
+                    </button>
+                    {/* Toggle Sidebar Button */}
+                    <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`w-10 h-10 mx-auto rounded-xl flex items-center justify-center transition-all text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 border-b border-slate-100 dark:border-slate-800 pb-2 mb-2 w-full`} onMouseEnter={e => setHoverTooltip({ name: "Thu gọn", rect: e.target.getBoundingClientRect() })} onMouseLeave={() => setHoverTooltip(null)}>
+                        <ChevronsLeft className={`w-5 h-5 transition-transform ${!isSidebarOpen ? 'rotate-180' : ''}`} />
                     </button>
                 </div>
 
@@ -71,16 +78,7 @@ window.Components.Sidebar = ({
                     </button>
                 </div>
 
-                {/* Desktop Bottom Actions */}
-                <div className="mt-auto flex flex-col items-center gap-4 pt-4 border-t border-slate-100 dark:border-slate-800 w-full hidden md:flex">
-                    <button onClick={() => setShowAppLauncher(true)} className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800`} onMouseEnter={e => setHoverTooltip({ name: "Ứng dụng", rect: e.target.getBoundingClientRect() })} onMouseLeave={() => setHoverTooltip(null)}>
-                        <Grid3x3 className="w-5 h-5" />
-                    </button>
-                    {/* Toggle Sidebar Button */}
-                    <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800`} onMouseEnter={e => setHoverTooltip({ name: "Thu gọn", rect: e.target.getBoundingClientRect() })} onMouseLeave={() => setHoverTooltip(null)}>
-                        <ChevronsLeft className={`w-5 h-5 transition-transform ${!isSidebarOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                </div>
+
             </aside>
         </>
     );

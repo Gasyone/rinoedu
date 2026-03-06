@@ -203,6 +203,7 @@ window.Components.SquareHomepage = ({
     const [showAttachMenu, setShowAttachMenu] = useState(false);
     const [activeTools, setActiveTools] = useState({ search: false, image: false, code: false });
     const [showCodeCanvas, setShowCodeCanvas] = useState(false);
+    const [includeContext, setIncludeContext] = useState(false); // Thêm state cho context
     const aiChatBottomRef = useRef(null);
     const aiInputRef = useRef(null);
 
@@ -239,39 +240,64 @@ window.Components.SquareHomepage = ({
         }
     };
 
-    const handleAiSend = () => {
+    const handleAiSend = async () => {
         if (!query.trim() || isAiTyping) return;
         setHasActiveSearch(true);
-        const userMsg = { id: Date.now(), role: 'user', content: query };
+        const userMsgContent = query;
+        const userMsg = { id: Date.now(), role: 'user', content: userMsgContent };
         const aiMsgId = Date.now() + 1;
         setAiMessages(prev => [...prev, userMsg]);
         setQuery('');
         setIsAiTyping(true);
         setAiMessages(prev => [...prev, { id: aiMsgId, role: 'ai', content: '', isThinking: true }]);
 
-        if (window.RinoAI) {
-            window.RinoAI.sendMessage(
-                userMsg.content,
-                (chunk) => {
-                    setAiMessages(prev => prev.map(m =>
-                        m.id === aiMsgId ? { ...m, content: m.content + chunk, isThinking: false } : m
-                    ));
-                },
-                () => { setIsAiTyping(false); },
-                (errMsg) => {
-                    setAiMessages(prev => prev.map(m =>
-                        m.id === aiMsgId ? { ...m, content: errMsg, isThinking: false, isError: true } : m
-                    ));
-                    setIsAiTyping(false);
-                }
-            );
-        } else {
-            setTimeout(() => {
+        try {
+            const currentUrl = window.location.href;
+            const currentPath = window.location.pathname;
+
+            // Format previous messages to send to backend (excluding thinking/error objects)
+            const messageHistory = aiMessages
+                .filter(m => m.content && !m.isThinking && !m.isError)
+                .map(m => ({
+                    role: m.role,
+                    content: m.content
+                }));
+
+            // Append the new user message
+            messageHistory.push({ role: 'user', content: userMsgContent });
+
+            const payload = {
+                message: userMsgContent,
+                messages: messageHistory, // Send full history for Agent memory
+                context: includeContext ? {
+                    url: currentUrl,
+                    path: currentPath,
+                } : {}
+            };
+
+            const response = await fetch('https://rinoapp-mcp.gasy.one/mcp/v1/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.status === "success") {
                 setAiMessages(prev => prev.map(m =>
-                    m.id === aiMsgId ? { ...m, content: 'Xin lỗi, module AI chưa được tải. Vui lòng tải lại trang.', isThinking: false } : m
+                    m.id === aiMsgId ? { ...m, content: data.reply, isThinking: false } : m
                 ));
-                setIsAiTyping(false);
-            }, 1000);
+            } else {
+                setAiMessages(prev => prev.map(m =>
+                    m.id === aiMsgId ? { ...m, content: data.error || data.reply || "Lỗi phản hồi từ máy chủ AI.", isThinking: false, isError: true } : m
+                ));
+            }
+        } catch (error) {
+            setAiMessages(prev => prev.map(m =>
+                m.id === aiMsgId ? { ...m, content: 'Lỗi kết nối tới AI backend: ' + error.message, isThinking: false, isError: true } : m
+            ));
+        } finally {
+            setIsAiTyping(false);
         }
     };
 
@@ -301,7 +327,7 @@ window.Components.SquareHomepage = ({
     };
 
     return (
-        <div className="flex flex-col h-screen bg-[#f8fafc] dark:bg-[#0f172a] overflow-hidden w-full relative text-slate-800 dark:text-slate-100 font-sans transition-colors duration-300">
+        <div className="flex flex-col h-screen bg-[#f8fafc] dark:bg-[#0f172a] overflow-hidden w-full relative text-slate-800 dark:text-slate-100 font-sans transition-colors duration-300" onClick={() => { setShowUserMenu(false); setShowAppLauncher(false); }}>
 
             {/* ── STICKY HEADER ── */}
             <div className={`flex items-center justify-between px-5 py-3 sticky top-0 z-50 bg-[#f8fafc]/90 dark:bg-[#0f172a]/90 backdrop-blur-md border-b transition-colors ${hasActiveSearch ? 'border-slate-200 dark:border-slate-800' : 'border-transparent'}`}>
@@ -530,6 +556,17 @@ window.Components.SquareHomepage = ({
                                     </button>
                                 );
                             })}
+                            {/* Context Toggle */}
+                            <label className="flex items-center gap-1.5 px-2 py-1 ml-2 cursor-pointer bg-white dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 hover:border-blue-300 transition-colors">
+                                <input
+                                    type="checkbox"
+                                    checked={includeContext}
+                                    onChange={(e) => setIncludeContext(e.target.checked)}
+                                    className="w-3 h-3 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                                />
+                                <span className="text-[10px] font-medium text-slate-600 dark:text-slate-300 select-none">Đính kèm bối cảnh (URL)</span>
+                            </label>
+
                             <button
                                 onClick={() => setIsWarehouseOpen(true)}
                                 className="ml-auto flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold transition-all border bg-white text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 hover:border-slate-300 hover:text-blue-600"

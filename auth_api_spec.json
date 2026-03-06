@@ -1,0 +1,194 @@
+{
+  "/auth/register": {
+    "post": {
+      "operationId": "AuthController_register",
+      "parameters": [],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RegisterParamsDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterResponse"
+              }
+            }
+          }
+        }
+      },
+      "summary": "Register",
+      "tags": [
+        "Auth API"
+      ]
+    }
+  },
+  "/auth/login": {
+    "post": {
+      "operationId": "AuthController_login",
+      "parameters": [],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/LoginDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginResponse"
+              }
+            }
+          }
+        }
+      },
+      "summary": "Login",
+      "tags": [
+        "Auth API"
+      ]
+    }
+  },
+  "/auth/refresh-token": {
+    "post": {
+      "operationId": "AuthController_refreshToken",
+      "parameters": [],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RefreshTokenDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenResponse"
+              }
+            }
+          }
+        }
+      },
+      "summary": "Refresh token",
+      "tags": [
+        "Auth API"
+      ]
+    }
+  },
+  "/auth/app/forgot-password/send-code": {
+    "post": {
+      "operationId": "AuthController_sendForgotPasswordCode",
+      "parameters": [],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SendForgotPasswordCodeDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordResponse"
+              }
+            }
+          }
+        }
+      },
+      "summary": "Send forgot password OTP (App)",
+      "tags": [
+        "Auth API"
+      ]
+    }
+  },
+  "/auth/app/forgot-password/verify-code": {
+    "post": {
+      "operationId": "AuthController_verifyForgotPasswordCode",
+      "parameters": [],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/VerifyForgotPasswordCodeDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyResetCodeResponse"
+              }
+            }
+          }
+        }
+      },
+      "summary": "Verify reset password OTP (App)",
+      "tags": [
+        "Auth API"
+      ]
+    }
+  },
+  "/auth/app/forgot-password/reset": {
+    "post": {
+      "operationId": "AuthController_resetPasswordWithToken",
+      "parameters": [],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ResetPasswordWithTokenDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordResponse"
+              }
+            }
+          }
+        }
+      },
+      "summary": "Reset password using resetToken (App)",
+      "tags": [
+        "Auth API"
+      ]
+    }
+  }
+}

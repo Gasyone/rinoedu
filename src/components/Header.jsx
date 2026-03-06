@@ -8,7 +8,7 @@ window.Components.Header = ({
     showNotifications, setShowNotifications, unreadCount,
     showUserMenu, setShowUserMenu, setShowSettingsModal, setShowLocationModal,
     groupedNotifications, notifFilter, setNotifFilter, markAsRead, markAllAsRead,
-    notifications
+    notifications, isDevAIOpen, setIsDevAIOpen
 }) => {
     const {
         Sliders, CheckSquare, X, Briefcase, Video, Shield, Check, Sparkles // Needed in notifications
@@ -37,7 +37,7 @@ window.Components.Header = ({
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            alert("RinoAI Đang phát triển");
+                            setIsDevAIOpen(true);
                         }}
                         className={`p-2 rounded-full transition flex items-center justify-center gap-2 ${isDarkMode ? 'text-indigo-400 hover:text-indigo-300 hover:bg-slate-800' : 'text-indigo-600 hover:text-indigo-700 hover:bg-slate-100'}`}
                         title="Hỏi RinoAI"
@@ -154,12 +154,7 @@ window.Components.Header = ({
                     <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-400 to-indigo-500 shadow-sm border border-white dark:border-slate-700 flex items-center justify-center font-bold text-white text-xs">
                         {currentUser?.name ? currentUser.name.substring(0, 2).toUpperCase() : '?'}
                     </div>
-                    <div className="hidden md:flex flex-col items-end">
-                        <div className="flex items-center gap-1">
-                            <span className={`text-xs font-bold leading-none max-w-[120px] truncate ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{currentUser?.name || 'Administrator'}</span>
-                        </div>
-                        <span className="text-[10px] text-slate-500 font-medium truncate max-w-[120px]">{currentUser?.email || 'admin@rinoedu.com'}</span>
-                    </div>
+
                     <ChevronDown className="w-3 h-3 text-slate-400 hidden md:block group-hover:text-slate-600" />
                 </button>
             </div>
