@@ -26,36 +26,35 @@ window.Components.Sidebar = ({
             </button>
 
             {/* SIDEBAR */}
-            <aside className={`fixed inset-y-0 left-0 z-40 bg-white dark:bg-[#111827] border-r border-slate-100 dark:border-slate-800 flex flex-col items-center py-5 transition-transform duration-300 shadow-lg ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} w-[240px] md:w-[72px]`} onClick={e => e.stopPropagation()}>
+            <aside className={`fixed inset-y-0 left-0 z-40 bg-white dark:bg-[#111827] border-r border-slate-100 dark:border-slate-800 flex flex-col items-center py-4 transition-transform duration-300 shadow-lg ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} w-[240px] md:w-[60px]`} onClick={e => e.stopPropagation()}>
 
                 {/* Desktop Home Button (Fixed Navigation) */}
-                <div className="mb-2 hidden md:flex flex-col gap-2 w-full px-2">
-                    <button onClick={() => handleOpenApp('dashboard')} className={`w-10 h-10 mx-auto rounded-xl flex items-center justify-center transition-all ${activeModuleId === 'dashboard' ? 'bg-blue-600 text-white shadow-glow' : 'bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-600 dark:bg-slate-700 dark:text-slate-300'}`} onMouseEnter={e => setHoverTooltip({ name: "Trang chủ", rect: e.target.getBoundingClientRect() })} onMouseLeave={() => setHoverTooltip(null)}>
-                        <Home className="w-5 h-5" />
+                <div className="mb-1.5 hidden md:flex flex-col gap-1.5 w-full px-2">
+                    <button onClick={() => handleOpenApp('dashboard')} className={`w-9 h-9 mx-auto rounded-xl flex items-center justify-center transition-all ${activeModuleId === 'dashboard' ? 'bg-blue-600 text-white shadow-glow' : 'bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-600 dark:bg-slate-700 dark:text-slate-300'}`} onMouseEnter={e => setHoverTooltip({ name: "Trang chủ", rect: e.target.getBoundingClientRect() })} onMouseLeave={() => setHoverTooltip(null)}>
+                        <Home className="w-[22px] h-[22px]" />
                     </button>
-                    <button onClick={() => setShowAppLauncher(true)} className={`w-10 h-10 mx-auto rounded-xl flex items-center justify-center transition-all text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800`} onMouseEnter={e => setHoverTooltip({ name: "Ứng dụng", rect: e.target.getBoundingClientRect() })} onMouseLeave={() => setHoverTooltip(null)}>
-                        <Grid3x3 className="w-5 h-5" />
+                    <button onClick={() => setShowAppLauncher(true)} className={`w-9 h-9 mx-auto rounded-xl flex items-center justify-center transition-all text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800`} onMouseEnter={e => setHoverTooltip({ name: "Ứng dụng", rect: e.target.getBoundingClientRect() })} onMouseLeave={() => setHoverTooltip(null)}>
+                        <Grid3x3 className="w-[22px] h-[22px]" />
                     </button>
-                    {/* Toggle Sidebar Button */}
-                    <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`w-10 h-10 mx-auto rounded-xl flex items-center justify-center transition-all text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 border-b border-slate-100 dark:border-slate-800 pb-2 mb-2 w-full`} onMouseEnter={e => setHoverTooltip({ name: "Thu gọn", rect: e.target.getBoundingClientRect() })} onMouseLeave={() => setHoverTooltip(null)}>
-                        <ChevronsLeft className={`w-5 h-5 transition-transform ${!isSidebarOpen ? 'rotate-180' : ''}`} />
+                    <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`w-9 h-9 mx-auto rounded-xl flex items-center justify-center transition-all text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 border-b border-slate-100 dark:border-slate-800 pb-2 mb-1.5 w-full`} onMouseEnter={e => setHoverTooltip({ name: "Thu gọn", rect: e.target.getBoundingClientRect() })} onMouseLeave={() => setHoverTooltip(null)}>
+                        <ChevronsLeft className={`w-[22px] h-[22px] transition-transform ${!isSidebarOpen ? 'rotate-180' : ''}`} />
                     </button>
                 </div>
 
                 {/* Desktop Main Navigation */}
-                <nav className="flex-1 w-full px-2 flex-col gap-3 overflow-y-auto hover-scroll hidden md:flex" style={{ scrollbarWidth: 'none' }}>
+                <nav className="flex-1 w-full px-2 flex-col gap-1.5 overflow-y-auto hover-scroll hidden md:flex" style={{ scrollbarWidth: 'none' }}>
                     {pinnedAppIds.filter(id => id !== 'dashboard').map(id => {
                         const app = ALL_APP_LIBRARY[id];
                         if (!app) return null;
                         const isActive = activeModuleId === id;
                         return (
-                            <button key={id} onClick={() => handleOpenApp(id)} className={`relative group w-full aspect-square rounded-xl flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600 dark:hover:bg-slate-800'}`} onMouseEnter={e => setHoverTooltip({ name: app.name, category: app.category, rect: e.target.getBoundingClientRect() })} onMouseLeave={() => setHoverTooltip(null)}>
-                                <app.icon className={`w-6 h-6 transition-transform ${isActive ? 'scale-110' : 'group-hover:scale-110'} ${!isActive ? (isDarkMode ? 'text-slate-400' : app.color) : ''}`} />
-                                {isActive && <div className="absolute left-0 top-3 bottom-3 w-1 bg-blue-600 rounded-r-full"></div>}
+                            <button key={id} onClick={() => handleOpenApp(id)} className={`relative group w-9 h-9 mx-auto rounded-xl flex items-center justify-center transition-all duration-200 ${isActive ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600 dark:hover:bg-slate-800'}`} onMouseEnter={e => setHoverTooltip({ name: app.name, category: app.category, rect: e.target.getBoundingClientRect() })} onMouseLeave={() => setHoverTooltip(null)}>
+                                <app.icon className={`w-[22px] h-[22px] transition-transform ${isActive ? 'scale-110' : 'group-hover:scale-105'} ${!isActive ? (isDarkMode ? 'text-slate-400' : app.color) : ''}`} />
+                                {isActive && <div className="absolute left-0 top-2 bottom-2 w-[3px] bg-blue-600 rounded-r-full"></div>}
                             </button>
                         )
                     })}
-                    <button onClick={() => setShowAppLauncher(true)} className="w-10 h-10 mx-auto rounded-full border border-dashed border-slate-300 text-slate-400 hover:border-blue-400 hover:text-blue-500 flex items-center justify-center mt-2 transition"><Plus className="w-5 h-5" /></button>
+                    <button onClick={() => setShowAppLauncher(true)} className="w-9 h-9 mx-auto rounded-full border border-dashed border-slate-300 text-slate-400 hover:border-blue-400 hover:text-blue-500 flex items-center justify-center mt-1.5 transition"><Plus className="w-4.5 h-4.5" /></button>
                 </nav>
 
                 {/* Mobile Context Menu (Visible only on Mobile) */}

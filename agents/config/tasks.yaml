@@ -1,0 +1,153 @@
+# ======================================================
+# RINOEDU AI FACTORY — Task Definitions
+# ======================================================
+# Mỗi task định nghĩa: description, expected_output, agent
+# {feature_request} là placeholder được thay bằng yêu cầu thực
+# ======================================================
+
+planning_task:
+  description: >
+    Phân tích yêu cầu sau đây từ Human Developer:
+    "{feature_request}"
+    
+    Hãy xác định rõ:
+    1. Module nào cần làm (iam/hr/mdm/crm/education/logistics/fintech/comms)?
+    2. Tên tính năng và mục đích (What & Why)?
+    3. Danh sách các API Endpoint cần thiết (method, path, params)?
+    4. Các màn hình/component UI cần tạo?
+    5. Dữ liệu mẫu (mock data) cần thiết trong db.json?
+    6. Phân công cụ thể: be làm gì, ui làm gì, fe làm gì?
+  expected_output: >
+    Một bản kế hoạch chi tiết (Project Brief) với 6 mục trên,
+    được trình bày rõ ràng, ngắn gọn. Bản kế hoạch này sẽ được
+    dùng làm input cho các agents tiếp theo.
+  agent: pm
+
+backend_task:
+  description: >
+    Dựa trên Project Brief sau đây:
+    {planning_output}
+    
+    Hãy thực hiện:
+    1. Định nghĩa TypeScript Interface/Type vào file trong src/shared/interfaces/
+       Ví dụ: nếu làm module education, tạo src/shared/interfaces/education.ts
+    2. Cập nhật mock-server/db.json: thêm dữ liệu mẫu với đúng tiền tố module
+       Ví dụ: "education_students": [...], "education_sessions": [...]
+    3. Định nghĩa API Contract rõ ràng cho Agent fe sử dụng
+    
+    LUẬT BẮT BUỘC:
+    - Tên bảng trong db.json PHẢI có tiền tố module
+    - Interface phải có JSDoc comment mô tả từng field
+    - Mock data phải có ít nhất 5 records thực tế
+  expected_output: >
+    1. Nội dung file Interface TypeScript (.ts) cần tạo
+    2. Phần JSON cần thêm vào db.json
+    3. API Contract document (endpoint, method, request/response schema)
+  agent: be
+
+ui_design_task:
+  description: >
+    Dựa trên Project Brief sau đây:
+    {planning_output}
+    
+    Hãy thiết kế cấu trúc giao diện:
+    1. Component tree (danh sách component cần tạo và quan hệ cha/con)
+    2. Layout structure cho màn hình chính
+    3. Danh sách Tailwind classes cần dùng (ưu tiên dùng Design Token vars)
+    4. Các state của UI (loading, empty, error, success)
+    5. Mobile-first considerations
+    
+    Tham chiếu Design Tokens tại: src/shared/design-tokens.css
+    (dùng var(--color-brand-primary) thay vì #2563eb, v.v..)
+  expected_output: >
+    Bản thiết kế UI bao gồm:
+    - Component tree diagram (text format)
+    - Mô tả layout và styling cho từng component
+    - Spec cho loading/empty/error states
+  agent: ui
+
+frontend_task:
+  description: >
+    Dựa trên:
+    - Project Brief: {planning_output}
+    - Backend Contract: {backend_output}
+    - UI Design: {ui_output}
+    
+    Hãy viết code React/JSX hoàn chỉnh cho tính năng này.
+    
+    QUY TẮC BẮT BUỘC:
+    1. Import Interface từ đúng file trong src/shared/interfaces/
+    2. Fetch data từ mock-server (http://localhost:3001) theo API Contract
+    3. Xử lý đầy đủ: loading state, error state, empty state
+    4. Dùng var(--color-*) CSS variables thay vì hardcode màu
+    5. Component phải nhận isDarkMode prop để hỗ trợ dark mode
+    6. Không hardcode data — dùng state + useEffect để fetch
+  expected_output: >
+    Code JSX hoàn chỉnh, sẵn sàng để lưu vào file,
+    với đầy đủ imports, component definition, và export.
+    Code phải chạy được ngay không cần chỉnh sửa thêm.
+  agent: fe
+
+review_task:
+  description: >
+    Review toàn bộ code sau đây theo Modular Monolith Boundary Rules:
+    
+    === BACKEND OUTPUT ===
+    {backend_output}
+    
+    === FRONTEND CODE ===
+    {frontend_output}
+    
+    CHECKLIST (phải pass 100%):
+    [ ] Không có cross-module query trong db.json
+    [ ] Interface được import đúng từ /shared/interfaces/
+    [ ] Tất cả component có loading/error/empty state
+    [ ] Không có credential/secret nào bị hardcode
+    [ ] Mock data có đúng tiền tố module
+    [ ] Fetch URL trỏ đúng về mock-server
+    
+    Đưa ra phán quyết: PASS hoặc REJECT (kèm lý do và cách sửa cụ thể)
+  expected_output: >
+    Báo cáo review với:
+    - Phán quyết: PASS hoặc REJECT
+    - Nếu REJECT: liệt kê chính xác từng vi phạm và cách sửa
+    - Nếu PASS: xác nhận các điểm tốt của code
+  agent: review
+
+test_task:
+  description: >
+    Dựa trên tính năng vừa hoàn thành:
+    {planning_output}
+    
+    Hãy viết test cases theo format Gherkin (Given/When/Then):
+    1. Happy path (luồng bình thường)
+    2. Edge cases (dữ liệu rỗng, lỗi network, không có quyền)
+    3. UI states (loading, error message hiển thị đúng)
+    
+    Với mỗi test case, chỉ rõ:
+    - File/component nào cần test
+    - Cách mock data/API để test
+    - Expected behavior
+  expected_output: >
+    Danh sách test cases đầy đủ theo format Gherkin,
+    ít nhất 5 test cases bao phủ các scenario quan trọng.
+  agent: test
+
+documentation_task:
+  description: >
+    Viết tài liệu kỹ thuật đầy đủ cho tính năng vừa hoàn thành.
+    
+    Thông tin tổng hợp:
+    - Feature: {planning_output}
+    - API Contract: {backend_output}
+    - Review Status: {review_output}
+    
+    Tài liệu cần bao gồm:
+    1. Mô tả tính năng (tiếng Việt)
+    2. Hướng dẫn sử dụng cho End User
+    3. API Documentation (cho Developer)
+    4. Hướng dẫn integrate với Backend thật sau này
+  expected_output: >
+    File Markdown hoàn chỉnh, sẵn sàng để lưu vào thư mục docs/,
+    được viết bằng tiếng Việt kết hợp Anh ngữ cho thuật ngữ kỹ thuật.
+  agent: doc

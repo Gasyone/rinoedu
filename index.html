@@ -29,16 +29,20 @@
     <!-- Application Scripts -->
     <!-- API Modules -->
     <script src="src/api/ai.js"></script>
+    <script src="src/api/mock_auth.js"></script>
 
     <!-- UTILS: Icons, i18n, Mock Data -->
     <script type="text/babel" src="src/utils/icons.jsx"></script>
-    <script src="src/utils/i18n.js"></script>
     <script type="text/babel" src="src/utils/data.jsx"></script>
+    <script type="text/babel" src="src/utils/i18n.js"></script>
+    <script type="text/babel" src="src/utils/formatters.js"></script>
+    <script type="text/babel" src="src/utils/hooks.jsx"></script>
 
     <!-- LAYOUTS -->
     <script type="text/babel" src="src/layouts/WorkspaceLoader.jsx"></script>
 
     <!-- COMPONENTS -->
+    <script type="text/babel" src="src/components/ShortcutGuideModal.jsx"></script>
     <script type="text/babel" src="src/components/PaymentModal.jsx"></script>
     <script type="text/babel" src="src/components/Sidebar.jsx"></script>
     <script type="text/babel" src="src/components/Header.jsx"></script>
@@ -47,6 +51,11 @@
     <script type="text/babel" src="src/components/UserMenu.jsx"></script>
     <script type="text/babel" src="src/components/SocialFeed.jsx"></script>
     <script type="text/babel" src="src/components/DevAISidebar.jsx"></script>
+    <script type="text/babel" src="src/components/SubSidebar.jsx"></script>
+
+    <!-- COMMON COMPONENTS CORE -->
+    <script type="text/babel" src="src/components/common/NotificationBell.jsx"></script>
+    <script type="text/babel" src="src/components/common/FileUploader.jsx"></script>
 
     <!-- PAGES -->
     <script type="text/babel" src="src/pages/Dashboard.jsx"></script>
@@ -58,11 +67,20 @@
     <script type="text/babel" src="src/modules/iam/AccountSettings.jsx"></script>
     <script type="text/babel" src="src/modules/iam/AccountSecurity.jsx"></script>
     <script type="text/babel" src="src/modules/iam/AccountProfile.jsx"></script>
+    <script type="text/babel" src="src/modules/iam/OrgSettings.jsx"></script>
+    <script type="text/babel" src="src/modules/iam/SysUsers.jsx"></script>
     <script type="text/babel" src="src/modules/iam/AccountManager.jsx"></script>
+
+    <!-- ADMIN MODULES CORE -->
+    <script type="text/babel" src="src/pages/admin/SystemLogs.jsx"></script>
+    <script type="text/babel" src="src/pages/admin/Webhooks.jsx"></script>
+
     <!-- EDUCATION: Class Management (formerly: class_management) -->
     <script type="text/babel" src="src/modules/education/ClassManager.jsx"></script>
     <!-- HR: Center Operations (formerly: center_ops) -->
     <script type="text/babel" src="src/modules/hr/CenterOps.jsx"></script>
+    <!-- MDM: Asset / Warehouse Module -->
+    <script type="text/babel" src="src/modules/mdm/Warehouse.jsx"></script>
 
     <!-- MAIN APP ENTRY -->
     <script type="text/babel" src="./src/app.jsx"></script>

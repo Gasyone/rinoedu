@@ -36,3 +36,7 @@ node_installer.msi
 
 # Gemini AI
 .gemini/
+
+# RinoEdu AI Factory
+agents/.venv/
+agents/.env

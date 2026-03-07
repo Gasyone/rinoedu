@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>RinoEdu - Redirecting...</title>
+    <script type="text/javascript">
+        // Single Page Apps for GitHub Pages
+        // https://github.com/rafrex/spa-github-pages
+        // This script takes the current url and converts the path into a query string
+        // so that the single page app can render the right page.
+        var pathSegmentsToKeep = 0;
+
+        var l = window.location;
+        l.replace(
+            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+            l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+            l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+            (l.search ? '&' + l.search.replace(/&/g, '~and~') : '') +
+            l.hash
+        );
+
+        // However, for our specific hash-based implementation in app.jsx, 
+        // we can just redirect to the hash directly if we detect a subpath.
+        // If the path is something like /account_manager, we redirect to /#/account_manager
+
+        var segment = l.pathname.split('/').pop();
+        if (segment && segment !== 'index.html' && segment !== '404.html') {
+            window.location.href = l.origin + l.pathname.substring(0, l.pathname.lastIndexOf('/') + 1) + '#/' + segment;
+        } else {
+            window.location.href = l.origin + l.pathname.substring(0, l.pathname.lastIndexOf('/') + 1);
+        }
+    </script>
+</head>
+
+<body>
+</body>
+
+</html>

@@ -1,0 +1,16 @@
+[project]
+name = "rinoedu-ai-factory"
+version = "0.1.0"
+description = "RinoEdu AI Factory — Multi-Agent Software Development System"
+requires-python = ">=3.10"
+dependencies = [
+    "crewai>=0.80.0",
+    "crewai-tools>=0.20.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0",
+    "gitpython>=3.1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

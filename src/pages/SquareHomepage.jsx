@@ -1,5 +1,6 @@
 // src/pages/SquareHomepage.jsx
 const { useState, useEffect, useRef } = React;
+const { Check, Copy } = window.Icons;
 
 // ────────────────────────────────────────────────
 // MOCK DATA
@@ -22,9 +23,11 @@ const SEARCH_RESULTS_MOCK = [
 ];
 
 const SYSTEM_GLOBAL_APPS = [
-    { id: 'marketplace', name: 'Chợ ứng dụng', iconName: 'Grid3x3', color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-900/20' },
-    { id: 'network', name: 'Kết nối', iconName: 'Globe', color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
-    { id: 'dev', name: 'Developers', iconName: 'Zap', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20' },
+    { id: 'education', name: 'Đào tạo', iconName: 'BookOpen', color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
+    { id: 'hr', name: 'Nhân sự', iconName: 'Users', color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
+    { id: 'crm', name: 'CRM', iconName: 'Target', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20' },
+    { id: 'assets', name: 'Kho tài sản', iconName: 'Database', color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
+    { id: 'account_manager', name: 'Quản lý tài khoản', iconName: 'User', color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20' },
 ];
 
 // ────────────────────────────────────────────────
@@ -196,14 +199,45 @@ window.Components.SquareHomepage = ({
     const [isSearching, setIsSearching] = useState(false);
     const [isWarehouseOpen, setIsWarehouseOpen] = useState(false);
     const [isVoiceMode, setIsVoiceMode] = useState(false);
-    const [aiMessages, setAiMessages] = useState([
-        { id: 1, role: 'ai', content: 'Xin chào! Tôi là **RinoEdu AI** – trợ lý thông minh của hệ thống giáo dục RinoEdu.\n\nTôi có thể giúp bạn:\n• Tìm kiếm thông tin về học viên, lớp học, giáo viên\n• Giải đáp thắc mắc về các tính năng của hệ thống\n• Hỗ trợ quản lý lịch học và báo cáo\n• Trả lời câu hỏi liên quan đến học phí và vận hành trung tâm\n\nBạn cần hỗ trợ gì hôm nay?' }
-    ]);
+
+    // ----- AI Chat History: Lưu theo User ID -----
+    const WELCOME_MSG = { id: 1, role: 'ai', content: 'Xin chào! Tôi là **RinoEdu AI** – trợ lý thông minh của hệ thống giáo dục RinoEdu.\n\nTôi có thể giúp bạn:\n• Tìm kiếm thông tin về học viên, lớp học, giáo viên\n• Giải đáp thắc mắc về các tính năng của hệ thống\n• Hỗ trợ quản lý lịch học và báo cáo\n• Trả lời câu hỏi liên quan đến học phí và vận hành trung tâm\n\nBạn cần hỗ trợ gì hôm nay?' };
+
+    const getChatKey = () => {
+        try {
+            const profile = JSON.parse(localStorage.getItem('rino_user_profile') || '{}');
+            return `rino_chat_history_${profile.id || profile.email || 'guest'}`;
+        } catch { return 'rino_chat_history_guest'; }
+    };
+
+    const [aiMessages, setAiMessages] = useState(() => {
+        try {
+            const key = getChatKey();
+            const saved = localStorage.getItem(key);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+        } catch { /* ignore */ }
+        return [WELCOME_MSG];
+    });
+
+    // Persist chat history whenever messages change
+    useEffect(() => {
+        try {
+            const key = getChatKey();
+            // Only keep last 50 messages to avoid quota
+            const toSave = aiMessages.filter(m => !m.isThinking).slice(-50);
+            localStorage.setItem(key, JSON.stringify(toSave));
+        } catch { /* ignore quota */ }
+    }, [aiMessages]);
+    // -----------------------------------------------
+
     const [isAiTyping, setIsAiTyping] = useState(false);
     const [showAttachMenu, setShowAttachMenu] = useState(false);
     const [activeTools, setActiveTools] = useState({ search: false, image: false, code: false });
     const [showCodeCanvas, setShowCodeCanvas] = useState(false);
-    const [includeContext, setIncludeContext] = useState(false); // Thêm state cho context
+    const [includeContext, setIncludeContext] = useState(false);
     const aiChatBottomRef = useRef(null);
     const aiInputRef = useRef(null);
 
@@ -305,19 +339,74 @@ window.Components.SquareHomepage = ({
         setActiveTools(prev => ({ ...prev, [tool]: !prev[tool] }));
     };
 
-    // Render a single AI message with basic markdown (bold, bullet)
+    // Full markdown renderer: code blocks, headers, bold/italic, lists
     const renderAiText = (text) => {
         if (!text) return null;
-        return text.split('\n').map((line, i) => {
-            // Bold: **text**
-            const parts = line.split(/\*\*(.*?)\*\*/g);
-            return (
-                <p key={i} className={line.startsWith('•') ? 'pl-2' : ''}>
-                    {parts.map((part, j) =>
-                        j % 2 === 1 ? <strong key={j}>{part}</strong> : part
-                    )}
-                </p>
-            );
+        const [copiedCode, setCopiedCode] = React.useState(null);
+
+        const handleCopyCode = (code, idx) => {
+            navigator.clipboard.writeText(code);
+            setCopiedCode(idx);
+            setTimeout(() => setCopiedCode(null), 2000);
+        };
+
+        // Split by code blocks first
+        const segments = text.split(/(```[\s\S]*?```)/g);
+
+        return segments.map((segment, segIdx) => {
+            if (segment.startsWith('```') && segment.endsWith('```')) {
+                const lines = segment.split('\n');
+                const lang = lines[0].replace('```', '').trim() || 'code';
+                const code = lines.slice(1, -1).join('\n');
+                return (
+                    <div key={segIdx} className="relative my-3 rounded-xl overflow-hidden border border-slate-700 group">
+                        <div className="flex items-center justify-between px-4 py-1.5 bg-slate-800 text-slate-400 text-[10px] font-mono">
+                            <span className="uppercase tracking-wider">{lang}</span>
+                            <button
+                                onClick={() => handleCopyCode(code, segIdx)}
+                                className="flex items-center gap-1 hover:text-white transition-colors"
+                            >
+                                {copiedCode === segIdx ? <><Check size={11} className="text-green-400" /> Copied!</> : <><Copy size={11} /> Copy</>}
+                            </button>
+                        </div>
+                        <pre className="bg-slate-900 text-green-400 text-xs p-4 overflow-x-auto font-mono leading-relaxed"><code>{code}</code></pre>
+                    </div>
+                );
+            }
+
+            // Inline render function for a line (bold, italic)
+            const renderInline = (line) => {
+                const tokens = line.split(/(\*\*.*?\*\*|\*.*?\*|`.*?`)/g);
+                return tokens.map((token, ti) => {
+                    if (token.startsWith('**') && token.endsWith('**')) return <strong key={ti} className="font-semibold">{token.slice(2, -2)}</strong>;
+                    if (token.startsWith('*') && token.endsWith('*')) return <em key={ti}>{token.slice(1, -1)}</em>;
+                    if (token.startsWith('`') && token.endsWith('`')) return <code key={ti} className="bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded text-[11px] font-mono text-rose-500 dark:text-rose-300">{token.slice(1, -1)}</code>;
+                    return token;
+                });
+            };
+
+            return segment.split('\n').map((line, li) => {
+                if (!line.trim()) return <div key={`${segIdx}-${li}`} className="h-2" />;
+
+                // Headers
+                if (line.startsWith('### ')) return <h3 key={`${segIdx}-${li}`} className="text-sm font-bold text-slate-800 dark:text-white mt-3 mb-1">{renderInline(line.slice(4))}</h3>;
+                if (line.startsWith('## ')) return <h2 key={`${segIdx}-${li}`} className="text-sm font-bold text-slate-900 dark:text-white mt-4 mb-1.5 border-b border-slate-200 dark:border-slate-700 pb-1">{renderInline(line.slice(3))}</h2>;
+                if (line.startsWith('# ')) return <h1 key={`${segIdx}-${li}`} className="text-base font-extrabold text-slate-900 dark:text-white mt-4 mb-2">{renderInline(line.slice(2))}</h1>;
+
+                // Bullet list
+                if (line.match(/^[-*•]\s/)) return <li key={`${segIdx}-${li}`} className="ml-4 list-disc marker:text-violet-400 text-sm leading-relaxed">{renderInline(line.slice(2).trim())}</li>;
+
+                // Numbered list
+                if (line.match(/^\d+\.\s/)) {
+                    const content = line.replace(/^\d+\.\s/, '');
+                    return <li key={`${segIdx}-${li}`} className="ml-4 list-decimal marker:text-violet-400 text-sm leading-relaxed">{renderInline(content)}</li>;
+                }
+
+                // Horizontal rule
+                if (line.match(/^---+$/)) return <hr key={`${segIdx}-${li}`} className="my-2 border-slate-200 dark:border-slate-700" />;
+
+                return <p key={`${segIdx}-${li}`} className="text-sm leading-relaxed">{renderInline(line)}</p>;
+            });
         });
     };
 
@@ -463,7 +552,15 @@ window.Components.SquareHomepage = ({
                                 {SYSTEM_GLOBAL_APPS.map(app => {
                                     const AppIcon = window.Icons[app.iconName];
                                     return (
-                                        <button key={app.id} className="flex flex-col items-center gap-2 group transition hover:-translate-y-1 w-20">
+                                        <button
+                                            key={app.id}
+                                            onClick={() => {
+                                                // Store which module should open, then navigate to workspace
+                                                sessionStorage.setItem('rino_pending_module', app.id);
+                                                onNavigateDashboard();
+                                            }}
+                                            className="flex flex-col items-center gap-2 group transition hover:-translate-y-1 w-20"
+                                        >
                                             <div className={`w-12 h-12 rounded-2xl ${app.bg} flex items-center justify-center shadow-sm group-hover:shadow-md transition-all`}>
                                                 {AppIcon ? <AppIcon className={`w-6 h-6 ${app.color}`} /> : null}
                                             </div>
@@ -619,10 +716,11 @@ window.Components.SquareHomepage = ({
                             </div>
                         </div>
 
-                        {/* INPUT BAR (pinned to bottom) */}
-                        <div className="flex-shrink-0 border-t border-slate-200 dark:border-slate-800 bg-[#f8fafc]/95 dark:bg-[#0f172a]/95 backdrop-blur-md px-4 py-3">
-                            <div className="max-w-3xl mx-auto">
-                                <div className="flex items-end gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 shadow-sm">
+                        {/* INPUT BAR (pinned to bottom with floating effect) */}
+                        <div className="flex-shrink-0 bg-transparent px-4 pb-6 pt-2">
+                            <div className="max-w-3xl mx-auto relative group">
+                                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-[1.25rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                                <div className="relative flex items-end gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 shadow-lg hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
                                     {/* Attachment */}
                                     <div className="relative self-end mb-0.5">
                                         <button
@@ -661,7 +759,7 @@ window.Components.SquareHomepage = ({
                                         <textarea
                                             ref={aiInputRef}
                                             rows={1}
-                                            className="flex-1 bg-transparent outline-none text-slate-800 dark:text-white placeholder-slate-400 text-sm py-1 resize-none max-h-32 overflow-y-auto leading-relaxed"
+                                            className="flex-1 bg-transparent outline-none text-slate-800 dark:text-white placeholder-slate-400 text-base py-1.5 resize-none max-h-32 overflow-y-auto leading-relaxed"
                                             placeholder="Hỏi RinoEdu AI bất cứ điều gì..."
                                             value={query}
                                             onChange={e => {

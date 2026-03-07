@@ -12,16 +12,18 @@ window.Components.UserMenu = ({
     showSettingsModal, setShowSettingsModal, onOpenApp, onLogout, currentUser
 }) => {
     const WORK_LOCATIONS = window.Data.WORK_LOCATIONS;
+    const [lang, setLang] = useState('vi');
 
     if (!showUserMenu) return null;
 
     return (
         <div className={`fixed bottom-0 left-0 right-0 w-full md:w-80 md:top-16 md:right-4 md:left-auto md:bottom-auto rounded-t-2xl md:rounded-2xl shadow-2xl border z-[60] animate-slide-up-mobile md:animate-scaleIn glass-panel ${isDarkMode ? 'border-slate-700 text-white' : 'border-slate-200 text-slate-800'} md:overflow-visible overflow-hidden`} onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3 bg-gradient-to-br from-slate-50 to-white dark:from-slate-800 dark:to-slate-900 rounded-t-2xl md:rounded-t-2xl">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-400 to-indigo-500 shadow-md p-0.5 border-2 border-white dark:border-slate-700 overflow-hidden">
-                    <div className="w-full h-full bg-slate-100 dark:bg-slate-800 rounded-full flex justify-center items-center font-bold text-slate-500">
+                <div className="relative w-12 h-12 rounded-full bg-gradient-to-tr from-blue-400 to-indigo-500 shadow-md p-0.5 border-2 border-white dark:border-slate-700 overflow-visible">
+                    <div className="w-full h-full bg-slate-100 dark:bg-slate-800 rounded-full flex justify-center items-center font-bold text-slate-500 overflow-hidden">
                         {currentUser?.name?.substring(0, 2)?.toUpperCase() || 'AD'}
                     </div>
+                    <div className="absolute -bottom-0.5 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
                 </div>
                 <div className="flex-1 min-w-0">
                     <h4 className="font-bold truncate">{currentUser?.name || 'Administrator'}</h4>
@@ -32,9 +34,9 @@ window.Components.UserMenu = ({
             </div>
 
             <div className="p-2 bg-slate-50 dark:bg-slate-900 flex flex-col gap-1 pb-6 md:pb-2 rounded-b-2xl md:rounded-b-2xl">
-                {/* Location Button with Hover Modal Trigger */}
-                <div className="relative group" onMouseEnter={() => setShowLocationModal(true)} onMouseLeave={() => setShowLocationModal(false)}>
-                    <button className="w-full flex items-center gap-3 p-2 text-sm text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700 rounded-lg transition font-medium justify-between group-hover:bg-slate-100 dark:group-hover:bg-slate-700" onClick={() => setShowLocationModal(!showLocationModal)}>
+                {/* Location Button */}
+                <div className="relative group" onClick={(e) => { e.stopPropagation(); setShowLocationModal(!showLocationModal); setShowSettingsModal(false); }}>
+                    <button className="w-full flex items-center gap-3 p-2 text-sm text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700 rounded-lg transition font-medium justify-between group-hover:bg-slate-100 dark:group-hover:bg-slate-700">
                         <div className="flex items-center gap-3"><MapPin className="w-4 h-4" /> Vị trí làm việc</div>
                         <div className="flex items-center gap-2">
                             <span className="text-[10px] bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-500 group-hover:bg-white truncate max-w-[80px]">{workLocation.name}</span>
@@ -70,9 +72,9 @@ window.Components.UserMenu = ({
                     )}
                 </div>
 
-                {/* Settings Button with Hover Modal Trigger */}
-                <div className="relative group" onMouseEnter={() => setShowSettingsModal(true)} onMouseLeave={() => setShowSettingsModal(false)}>
-                    <button className="w-full flex items-center gap-3 p-2 text-sm text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700 rounded-lg transition font-medium group-hover:bg-slate-100 dark:group-hover:bg-slate-700 justify-between" onClick={() => setShowSettingsModal(!showSettingsModal)}>
+                {/* Settings Button */}
+                <div className="relative group" onClick={(e) => { e.stopPropagation(); setShowSettingsModal(!showSettingsModal); setShowLocationModal(false); }}>
+                    <button className="w-full flex items-center gap-3 p-2 text-sm text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700 rounded-lg transition font-medium group-hover:bg-slate-100 dark:group-hover:bg-slate-700 justify-between">
                         <div className="flex items-center gap-3"><Settings className="w-4 h-4" /> Cài đặt</div>
                         <ChevronDown className="w-3 h-3 opacity-50 md:-rotate-90" />
                     </button>
@@ -99,7 +101,14 @@ window.Components.UserMenu = ({
                                     </div>
                                     <div className={`w-8 h-4 rounded-full flex items-center transition-all p-0.5 ${isExpandedMode ? 'bg-emerald-500 justify-end' : 'bg-slate-300 justify-start'}`}><div className="w-3 h-3 bg-white rounded-full shadow-sm"></div></div>
                                 </div>
-                                <div className="text-xs font-bold opacity-50 uppercase tracking-wider px-2 mt-2">Hệ thống</div>
+
+                                <div className="text-xs font-bold opacity-50 uppercase tracking-wider px-2 mt-2 border-t border-slate-100 dark:border-slate-700 pt-2">Ngôn ngữ / Language</div>
+                                <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg mb-2">
+                                    <button onClick={(e) => { e.stopPropagation(); setLang('vi'); }} className={`flex-1 py-1.5 text-xs font-bold rounded transition ${lang === 'vi' ? 'bg-white dark:bg-slate-600 shadow-sm text-blue-600 dark:text-blue-400' : 'text-slate-500'}`}>Tiếng Việt</button>
+                                    <button onClick={(e) => { e.stopPropagation(); setLang('en'); }} className={`flex-1 py-1.5 text-xs font-bold rounded transition ${lang === 'en' ? 'bg-white dark:bg-slate-600 shadow-sm text-blue-600 dark:text-blue-400' : 'text-slate-500'}`}>English</button>
+                                </div>
+
+                                <div className="text-xs font-bold opacity-50 uppercase tracking-wider px-2 mt-2 border-t border-slate-100 dark:border-slate-700 pt-2">Hệ thống</div>
                                 <div className="flex items-center justify-between p-2 rounded-lg cursor-pointer hover:bg-white/50 dark:hover:bg-slate-700 transition" onClick={() => setNotificationsEnabled(!notificationsEnabled)}>
                                     <div className="flex items-center gap-3">
                                         <div className={`p-1.5 rounded-md ${notificationsEnabled ? 'bg-rose-500 text-white' : 'bg-rose-50 text-rose-600'}`}><Bell className="w-4 h-4" /></div>
