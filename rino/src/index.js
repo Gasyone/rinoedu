@@ -311,37 +311,11 @@ QUY TẮC QUAN TRỌNG:
             }
         }
 
-        // ── FALLBACK ROUTE: Simple API Landing Page ──
-        const landingHTML = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>RinoEdu AI API</title>
-            <style>
-                body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f8fafc; color: #334155; }
-                .card { background: white; padding: 2.5rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); text-align: center; max-width: 400px; }
-                .success { color: #10b981; font-weight: bold; margin-bottom: 1rem; }
-                h1 { margin: 0 0 0.5rem 0; color: #0f172a; font-size: 1.5rem; }
-                p { margin: 0; font-size: 0.95rem; line-height: 1.5; }
-            </style>
-        </head>
-        <body>
-            <div class="card">
-                <div class="success">● Systems Operational</div>
-                <h1>RinoEdu AI API Server</h1>
-                <p>Welcome! This is the backend API server for RinoEdu. The AI Chat endpoints are functioning normally.</p>
-                <div style="margin-top: 1.5rem; font-size: 0.8rem; color: #94a3b8;">
-                    Endpoint: /mcp/v1/chat<br>
-                    Model: GPT-4o-mini
-                </div>
-            </div>
-        </body>
-        </html>`;
-
-        return new Response(landingHTML, {
-            status: 200,
+        // ── FALLBACK ROUTE ──
+        return new Response("Not Found. This is an API server.", {
+            status: 404,
             headers: {
-                "Content-Type": "text/html; charset=utf-8",
+                "Content-Type": "text/plain",
                 "Access-Control-Allow-Origin": "*",
             },
         });

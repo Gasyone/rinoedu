@@ -73,6 +73,11 @@ Dashboard là màn hình làm việc chính sau khi đăng nhập, bao gồm:
 - **Chờ phê duyệt (Pending Approvals):** Card gradient cam-đỏ hiển thị số phiếu chờ duyệt (Nghỉ phép, PO, Tạm ứng) + nút "Xử lý ngay".
 - **Hoạt động cá nhân (Activity Feed):** Timeline các hành động gần đây của user (duyệt PO, meeting, cập nhật hồ sơ...) + nút "Xem tất cả".
 
+### 3.5 Module Hỗ trợ (Ticket Management)
+Component chính: \`src/components/common/CreateTicketModal.jsx\`
+- **Tạo Ticket thủ công:** Từ **Trang chủ Dashboard**, người dùng nhấn vào nút **"Thêm mới"** (biểu tượng dấu +) nằm ở phần lưới **Truy cập nhanh** để mở Modal tạo Ticket Yêu cầu hỗ trợ (hoặc báo lỗi/đề xuất tính năng). Khai báo Tiêu đề, Vai trò, Loại, Mô tả chi tiết rồi Submit.
+- **Nhờ Rino AI tạo:** Người dùng có thể nhắn trực tiếp với hệ thống AI RinoEdu (ví dụ: "giúp tôi tạo một ticket bị lỗi UI trang chủ"). Hệ thống AI sẽ hỏi lại tiêu đề và mô tả, sau đó sử dụng tool nội bộ để tự động tạo Ticket gửi lên server.
+
 ---
 
 ## 4. HƯỚNG DẪN TÍNH NĂNG CHI TIẾT (USER GUIDE)
