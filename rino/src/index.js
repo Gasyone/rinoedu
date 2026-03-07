@@ -10,59 +10,7 @@ const TUNNEL_ORIGIN = "https://67abe048-6e57-4883-b4a7-ebff1b1cbba6.cfargotunnel
 const OPENAI_API_URL = "https://api.openai-proxy.com/v1/chat/completions"; // Pure pass-through Proxy that accepts official OpenAI sk- keys
 const OPENAI_MODEL = "gpt-4o-mini";
 
-// --- Atlassian Confluence Config ---
-const CONFLUENCE_DOMAIN = "https://rinoeduai.atlassian.net";
-
 import { WHITEPAPER_CONTENT } from './whitepaper.js';
-
-
-async function searchConfluence(query, env) {
-    if (!query) return JSON.stringify({ error: "Query is required" });
-    const authHeader = `Basic ${btoa(`${env.CONFLUENCE_EMAIL}:${env.CONFLUENCE_API_TOKEN}`)}`;
-    const cql = `text~"${query}" OR title~"${query}"`;
-    const searchUrl = `${CONFLUENCE_DOMAIN}/wiki/rest/api/content/search?cql=${encodeURIComponent(cql)}&limit=3&expand=body.storage`;
-    try {
-        const response = await fetch(searchUrl, {
-            headers: { "Authorization": authHeader, "Accept": "application/json" }
-        });
-        if (!response.ok) return JSON.stringify({ error: "Confluence API Error: " + response.statusText });
-        const data = await response.json();
-        if (data.results && data.results.length > 0) {
-            let combinedContent = "";
-            for (const result of data.results) {
-                const title = result.title;
-                const htmlBody = result.body?.storage?.value || "";
-                const cleanText = htmlBody.replace(/<[^>]*>?/gm, ' ').substring(0, 1500);
-                combinedContent += `--- TÀI LIỆU CONFLUENCE: ${title} ---\n${cleanText}\n\n`;
-            }
-            return combinedContent;
-        }
-        return JSON.stringify({ message: "No documents found matching the query" });
-    } catch (e) {
-        return JSON.stringify({ error: "Failed to fetch from Confluence: " + e.message });
-    }
-}
-
-async function countConfluenceSpaces(env) {
-    const authHeader = `Basic ${btoa(`${env.CONFLUENCE_EMAIL}:${env.CONFLUENCE_API_TOKEN}`)}`;
-    const spacesUrl = `${CONFLUENCE_DOMAIN}/wiki/rest/api/space`;
-    try {
-        const response = await fetch(spacesUrl, {
-            headers: { "Authorization": authHeader, "Accept": "application/json" }
-        });
-        if (!response.ok) {
-            const errText = await response.text();
-            return `LỖI API: HTTP ${response.status} - ${errText}`;
-        }
-        const data = await response.json();
-        const count = data.size || (data.results ? data.results.length : 0);
-        let spaceNames = [];
-        if (data.results) spaceNames = data.results.map(s => s.name);
-        return JSON.stringify({ message: `Found ${count} workspaces.`, workspace_names: spaceNames });
-    } catch (e) {
-        return `EXCEPTION: ${e.message} Stack: ${e.stack}`;
-    }
-}
 
 // ── OpenAI Function Calling Tool Definitions ──
 const openaiTools = [
@@ -77,27 +25,9 @@ const openaiTools = [
     {
         type: "function",
         function: {
-            name: "confluence_search",
-            description: "Tìm kiếm trên Confluence — CHỈ dùng khi người dùng hỏi về dự án, sprint, task Jira, hoặc quản lý công việc. KHÔNG dùng cho câu hỏi về tính năng hoặc màn hình.",
-            parameters: {
-                type: "object",
-                properties: {
-                    query: { type: "string", description: "The search query" }
-                },
-                required: ["query"]
-            }
-        }
-    },
-    {
-        type: "function",
-        function: {
-            name: "confluence_count_spaces",
-            description: "Đếm số workspace trên Confluence — chỉ dùng khi user hỏi về workspace/space.",
-            parameters: {
-                type: "object",
-                properties: {},
-                required: []
-            }
+            name: "read_whitepaper",
+            description: "ĐỌC tài liệu Sách Trắng RinoEdu — LUÔN LUÔN gọi tool này KHI người dùng hỏi về: tính năng màn hình, giao diện, UI, Homepage, Dashboard, module, kiến trúc hệ thống, component, hoặc BẤT CỨ điều gì liên quan đến nền tảng RinoEdu.",
+            parameters: { type: "object", properties: {}, required: [] }
         }
     },
     {
@@ -255,11 +185,7 @@ QUY TẮC QUAN TRỌNG:
 
                             let toolResult = "";
                             try {
-                                if (fnName === "confluence_search") {
-                                    toolResult = await searchConfluence(args.query, env);
-                                } else if (fnName === "confluence_count_spaces") {
-                                    toolResult = await countConfluenceSpaces(env);
-                                } else if (fnName === "read_whitepaper") {
+                                if (fnName === "read_whitepaper") {
                                     toolResult = WHITEPAPER_CONTENT;
                                 } else if (fnName === "create_ticket") {
                                     // Mocking ticket creation for the AI response
@@ -311,13 +237,7 @@ QUY TẮC QUAN TRỌNG:
             }
         }
 
-        // ── FALLBACK ROUTE ──
-        return new Response("Not Found. This is an API server.", {
-            status: 404,
-            headers: {
-                "Content-Type": "text/plain",
-                "Access-Control-Allow-Origin": "*",
-            },
-        });
+        // ── FALLBACK ROUTE: Redirect to Frontend ──
+        return Response.redirect("https://github.com/Gasy-headquater/rinoedu", 302);
     },
 };
