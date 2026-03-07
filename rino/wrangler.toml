@@ -1,0 +1,14 @@
+name = "rino"
+main = "src/index.js"
+compatibility_date = "2024-03-20"
+
+# The Account ID obtained dynamically
+account_id = "eb59b0246a147814cfe33c96f6ea5607"
+
+# Bindings for AI and Workers AI
+[ai]
+binding = "AI"
+
+[[routes]]
+  pattern = "rino.gasy.io"
+  custom_domain = true

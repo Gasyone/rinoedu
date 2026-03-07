@@ -309,7 +309,7 @@ window.Components.SquareHomepage = ({
                 } : {}
             };
 
-            const response = await fetch('https://rinoapp-mcp.gasy.one/mcp/v1/chat', {
+            const response = await fetch('https://rino.gasy.io/mcp/v1/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

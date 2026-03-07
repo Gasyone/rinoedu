@@ -1,5 +1,5 @@
 // src/api/client.js
-const API_BASE = "https://rinoapp-mcp.gasy.one/api"; // will be served by Cloudflare Workers
+const API_BASE = "https://rino.gasy.io/api"; // will be served by Cloudflare Workers
 
 /**
  * Global API Request handler mimicking Axios Interceptors.

@@ -258,7 +258,7 @@ flowchart TD
 │  ├── Fallback responses: 5 generic answers  │
 │  └── Quick Actions: navigate, theme, data   │
 ├─────────────────────────────────────────────┤
-│  Cloudflare Workers (rinoapp-mcp)           │
+│  Cloudflare Workers (rino)                 │
 │  └── LLM endpoint cho production            │
 └─────────────────────────────────────────────┘
 ```
