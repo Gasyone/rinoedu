@@ -437,396 +437,392 @@ window.Components.SquareHomepage = ({
     const toggleTool = (tool) => {
         setActiveTools(prev => ({ ...prev, [tool]: !prev[tool] }));
     };
+    const switchToAI = () => {
+        setActiveMode('ai');
+        setHasActiveSearch(true);
+    };
 
-    setActiveTools(prev => ({ ...prev, [tool]: !prev[tool] }));
-};
+    return (
+        <div className="flex flex-col h-screen bg-[#f8fafc] dark:bg-[#0f172a] overflow-hidden w-full relative text-slate-800 dark:text-slate-100 font-sans transition-colors duration-300" onClick={() => { setShowUserMenu(false); setShowAppLauncher(false); }}>
 
-const switchToAI = () => {
-    setActiveMode('ai');
-    setHasActiveSearch(true);
-};
+            {/* ── STICKY HEADER ── */}
+            <div className={`flex items-center justify-between px-5 py-3 sticky top-0 z-50 bg-[#f8fafc]/90 dark:bg-[#0f172a]/90 backdrop-blur-md border-b transition-colors ${hasActiveSearch ? 'border-slate-200 dark:border-slate-800' : 'border-transparent'}`}>
 
-return (
-    <div className="flex flex-col h-screen bg-[#f8fafc] dark:bg-[#0f172a] overflow-hidden w-full relative text-slate-800 dark:text-slate-100 font-sans transition-colors duration-300" onClick={() => { setShowUserMenu(false); setShowAppLauncher(false); }}>
-
-        {/* ── STICKY HEADER ── */}
-        <div className={`flex items-center justify-between px-5 py-3 sticky top-0 z-50 bg-[#f8fafc]/90 dark:bg-[#0f172a]/90 backdrop-blur-md border-b transition-colors ${hasActiveSearch ? 'border-slate-200 dark:border-slate-800' : 'border-transparent'}`}>
-
-            {/* LEFT: Logo (always clickable → home) */}
-            <button
-                onClick={handleGoHome}
-                className="flex items-center gap-2.5 group flex-shrink-0"
-                title="Về trang chủ"
-            >
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-blue-500/30 group-hover:scale-105 transition-all">
-                    <Zap className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-base font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 tracking-tight">
-                    RinoEdu
-                </span>
-            </button>
-
-            {/* CENTER: Search bar (only in search mode with results) */}
-            {hasActiveSearch && activeMode === 'search' && (
-                <div className="flex-1 max-w-xl mx-4">
-                    <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full px-4 py-2 shadow-sm hover:shadow-md transition-shadow">
-                        <Search className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                        <input
-                            type="text"
-                            className="flex-1 ml-3 bg-transparent outline-none text-slate-800 dark:text-white text-sm"
-                            placeholder="RinoEdu: Tìm kiếm toàn hệ thống..."
-                            value={query}
-                            onChange={e => setQuery(e.target.value)}
-                            onKeyDown={handleSearch}
-                            autoFocus
-                        />
-                        {query && (
-                            <button onClick={() => { setQuery(''); setHasActiveSearch(false); }} className="p-1 rounded-full text-slate-400 hover:text-slate-600 ml-2 transition-colors">
-                                <X className="w-3.5 h-3.5" />
-                            </button>
-                        )}
-                    </div>
-                </div>
-            )}
-
-            {/* CENTER: Switch to AI button (search mode) */}
-            {activeMode === 'search' && hasActiveSearch && (
+                {/* LEFT: Logo (always clickable → home) */}
                 <button
-                    onClick={switchToAI}
-                    className="flex items-center gap-2 px-3 py-2 bg-violet-50 dark:bg-violet-900/20 hover:bg-violet-100 dark:hover:bg-violet-900/30 text-violet-700 dark:text-violet-400 text-xs font-bold rounded-xl transition-colors border border-violet-200 dark:border-violet-800 flex-shrink-0 ml-2"
+                    onClick={handleGoHome}
+                    className="flex items-center gap-2.5 group flex-shrink-0"
+                    title="Về trang chủ"
                 >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    Hỏi AI
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-blue-500/30 group-hover:scale-105 transition-all">
+                        <Zap className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-base font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 tracking-tight">
+                        RinoEdu
+                    </span>
                 </button>
-            )}
 
-            {/* RIGHT: Auth actions */}
-            <div className="flex items-center gap-2 ml-3 flex-shrink-0">
-                {!isAuthenticated && (
-                    <button onClick={onNavigateLogin} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-sm font-bold rounded-xl transition-all shadow-sm">
-                        Đăng nhập
+                {/* CENTER: Search bar (only in search mode with results) */}
+                {hasActiveSearch && activeMode === 'search' && (
+                    <div className="flex-1 max-w-xl mx-4">
+                        <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full px-4 py-2 shadow-sm hover:shadow-md transition-shadow">
+                            <Search className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                            <input
+                                type="text"
+                                className="flex-1 ml-3 bg-transparent outline-none text-slate-800 dark:text-white text-sm"
+                                placeholder="RinoEdu: Tìm kiếm toàn hệ thống..."
+                                value={query}
+                                onChange={e => setQuery(e.target.value)}
+                                onKeyDown={handleSearch}
+                                autoFocus
+                            />
+                            {query && (
+                                <button onClick={() => { setQuery(''); setHasActiveSearch(false); }} className="p-1 rounded-full text-slate-400 hover:text-slate-600 ml-2 transition-colors">
+                                    <X className="w-3.5 h-3.5" />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* CENTER: Switch to AI button (search mode) */}
+                {activeMode === 'search' && hasActiveSearch && (
+                    <button
+                        onClick={switchToAI}
+                        className="flex items-center gap-2 px-3 py-2 bg-violet-50 dark:bg-violet-900/20 hover:bg-violet-100 dark:hover:bg-violet-900/30 text-violet-700 dark:text-violet-400 text-xs font-bold rounded-xl transition-colors border border-violet-200 dark:border-violet-800 flex-shrink-0 ml-2"
+                    >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        Hỏi AI
                     </button>
                 )}
-                {isAuthenticated && (
-                    <>
-                        <button
-                            onClick={e => { e.stopPropagation(); setShowAppLauncher(!showAppLauncher); setShowUserMenu(false); }}
-                            className={`p-2 rounded-full transition-colors ${showAppLauncher ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 hover:text-blue-600'}`}
-                            title="Ứng dụng"
-                        >
-                            <LayoutGrid className="w-5 h-5" />
-                        </button>
-                        <button onClick={onNavigateDashboard} className="hidden md:block px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition-colors text-xs">
-                            Dashboard
-                        </button>
-                        <button
-                            onClick={e => { e.stopPropagation(); setShowUserMenu(!showUserMenu); setShowAppLauncher(false); }}
-                            className={`w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden cursor-pointer transition-all ${showUserMenu ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-[#0f172a]' : ''}`}
-                        >
-                            {currentUser?.name
-                                ? <div className="w-full h-full bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center font-bold text-white text-xs">{currentUser.name.substring(0, 2).toUpperCase()}</div>
-                                : <User className="w-5 h-5 text-slate-400" />}
-                        </button>
-                    </>
-                )}
-            </div>
-        </div>
 
-        {/* ── CONTENT ── */}
-        <div className="flex-1 overflow-hidden flex flex-col">
-
-            {/* ════ HOMEPAGE (idle state) ════ */}
-            {!hasActiveSearch && (
-                <div className="flex flex-col flex-1 overflow-y-auto">
-                    {/* Hero */}
-                    <div className="flex flex-col items-center justify-center pt-16 pb-8 px-4">
-                        <div className="p-5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[2rem] shadow-2xl shadow-blue-500/30 mb-6 animate-float">
-                            <Zap className="w-14 h-14 text-white" />
-                        </div>
-                        <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 tracking-tight mb-2">
-                            RinoEdu
-                        </h1>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm mb-10">Nền tảng quản lý giáo dục thông minh</p>
-
-                        {/* Smart Action Bar */}
-                        <div className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 p-2 flex gap-2">
-                            {/* Search side */}
-                            <div className="flex-[3] flex items-center bg-slate-50 dark:bg-slate-900/50 rounded-xl px-4 h-12">
-                                <Search className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                                <input
-                                    type="text"
-                                    className="flex-1 ml-3 bg-transparent outline-none text-slate-800 dark:text-white placeholder-slate-400 text-sm w-full"
-                                    placeholder="Tìm kiếm toàn bộ hệ thống..."
-                                    value={query}
-                                    onChange={e => setQuery(e.target.value)}
-                                    onKeyDown={handleSearch}
-                                    autoFocus
-                                />
-                            </div>
-                            {/* Divider */}
-                            <div className="w-px bg-slate-200 dark:bg-slate-700 self-stretch my-1"></div>
-                            {/* AI side */}
+                {/* RIGHT: Auth actions */}
+                <div className="flex items-center gap-2 ml-3 flex-shrink-0">
+                    {!isAuthenticated && (
+                        <button onClick={onNavigateLogin} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-sm font-bold rounded-xl transition-all shadow-sm">
+                            Đăng nhập
+                        </button>
+                    )}
+                    {isAuthenticated && (
+                        <>
                             <button
-                                onClick={switchToAI}
-                                className="flex items-center gap-2 px-4 rounded-xl text-sm font-bold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors"
+                                onClick={e => { e.stopPropagation(); setShowAppLauncher(!showAppLauncher); setShowUserMenu(false); }}
+                                className={`p-2 rounded-full transition-colors ${showAppLauncher ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 hover:text-blue-600'}`}
+                                title="Ứng dụng"
                             >
-                                <Sparkles className="w-4 h-4" />
-                                <span className="hidden sm:inline">Hỏi AI</span>
+                                <LayoutGrid className="w-5 h-5" />
                             </button>
-                        </div>
-                    </div>
-
-                    {/* Quick Links */}
-                    <div className="max-w-lg mx-auto w-full px-4 pb-16">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase text-center mb-4 tracking-wider">Truy cập nhanh</p>
-                        <div className="flex flex-wrap justify-center gap-6">
-                            {SYSTEM_GLOBAL_APPS.map(app => {
-                                return (
-                                    <button
-                                        key={app.id}
-                                        onClick={() => {
-                                            // Store which module should open, then navigate to workspace
-                                            sessionStorage.setItem('rino_pending_module', app.id);
-                                            onNavigateDashboard();
-                                        }}
-                                        className="flex flex-col items-center gap-2 group transition hover:-translate-y-1 w-20"
-                                    >
-                                        <div className={`w-12 h-12 rounded-2xl ${app.bg} flex items-center justify-center shadow-sm group-hover:shadow-md transition-all`}>
-                                            <SafeIcon iconName={app.iconName} className={`w-6 h-6 ${app.color}`} />
-                                        </div>
-                                        <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-center leading-tight">{app.name}</span>
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
+                            <button onClick={onNavigateDashboard} className="hidden md:block px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition-colors text-xs">
+                                Dashboard
+                            </button>
+                            <button
+                                onClick={e => { e.stopPropagation(); setShowUserMenu(!showUserMenu); setShowAppLauncher(false); }}
+                                className={`w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden cursor-pointer transition-all ${showUserMenu ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-[#0f172a]' : ''}`}
+                            >
+                                {currentUser?.name
+                                    ? <div className="w-full h-full bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center font-bold text-white text-xs">{currentUser.name.substring(0, 2).toUpperCase()}</div>
+                                    : <User className="w-5 h-5 text-slate-400" />}
+                            </button>
+                        </>
+                    )}
                 </div>
-            )}
+            </div>
 
-            {/* ════ SEARCH RESULTS ════ */}
-            {hasActiveSearch && activeMode === 'search' && (
-                <div className="flex-1 overflow-y-auto px-4 py-4">
-                    <div className="max-w-3xl mx-auto">
-                        {/* Filter tabs */}
-                        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-3">
-                            {[
-                                { id: 'all', label: 'Tất cả' },
-                                { id: 'apps', label: 'Ứng dụng' },
-                                { id: 'docs', label: 'Tài liệu' },
-                                { id: 'people', label: 'Mọi người' }
-                            ].map(tab => (
+            {/* ── CONTENT ── */}
+            <div className="flex-1 overflow-hidden flex flex-col">
+
+                {/* ════ HOMEPAGE (idle state) ════ */}
+                {!hasActiveSearch && (
+                    <div className="flex flex-col flex-1 overflow-y-auto">
+                        {/* Hero */}
+                        <div className="flex flex-col items-center justify-center pt-16 pb-8 px-4">
+                            <div className="p-5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[2rem] shadow-2xl shadow-blue-500/30 mb-6 animate-float">
+                                <Zap className="w-14 h-14 text-white" />
+                            </div>
+                            <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 tracking-tight mb-2">
+                                RinoEdu
+                            </h1>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm mb-10">Nền tảng quản lý giáo dục thông minh</p>
+
+                            {/* Smart Action Bar */}
+                            <div className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 p-2 flex gap-2">
+                                {/* Search side */}
+                                <div className="flex-[3] flex items-center bg-slate-50 dark:bg-slate-900/50 rounded-xl px-4 h-12">
+                                    <Search className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                                    <input
+                                        type="text"
+                                        className="flex-1 ml-3 bg-transparent outline-none text-slate-800 dark:text-white placeholder-slate-400 text-sm w-full"
+                                        placeholder="Tìm kiếm toàn bộ hệ thống..."
+                                        value={query}
+                                        onChange={e => setQuery(e.target.value)}
+                                        onKeyDown={handleSearch}
+                                        autoFocus
+                                    />
+                                </div>
+                                {/* Divider */}
+                                <div className="w-px bg-slate-200 dark:bg-slate-700 self-stretch my-1"></div>
+                                {/* AI side */}
                                 <button
-                                    key={tab.id}
-                                    onClick={() => setSearchTab(tab.id)}
-                                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap border ${searchTab === tab.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:border-slate-300'}`}
+                                    onClick={switchToAI}
+                                    className="flex items-center gap-2 px-4 rounded-xl text-sm font-bold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors"
                                 >
-                                    {tab.label}
+                                    <Sparkles className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Hỏi AI</span>
                                 </button>
-                            ))}
+                            </div>
                         </div>
 
-                        {isSearching ? (
-                            <div className="flex justify-center py-10 text-slate-400 text-sm">Đang tìm kiếm...</div>
-                        ) : searchTab === 'all' ? (
-                            <div className="space-y-3 animate-fade-in">
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">Kết quả hàng đầu</p>
-                                {SEARCH_RESULTS_MOCK.map(item => {
+                        {/* Quick Links */}
+                        <div className="max-w-lg mx-auto w-full px-4 pb-16">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase text-center mb-4 tracking-wider">Truy cập nhanh</p>
+                            <div className="flex flex-wrap justify-center gap-6">
+                                {SYSTEM_GLOBAL_APPS.map(app => {
                                     return (
-                                        <div key={item.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-all cursor-pointer flex items-center gap-4 group">
-                                            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700 text-blue-600 dark:text-blue-400 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors flex-shrink-0">
-                                                <SafeIcon iconName={item.iconName} className="w-5 h-5" />
+                                        <button
+                                            key={app.id}
+                                            onClick={() => {
+                                                // Store which module should open, then navigate to workspace
+                                                sessionStorage.setItem('rino_pending_module', app.id);
+                                                onNavigateDashboard();
+                                            }}
+                                            className="flex flex-col items-center gap-2 group transition hover:-translate-y-1 w-20"
+                                        >
+                                            <div className={`w-12 h-12 rounded-2xl ${app.bg} flex items-center justify-center shadow-sm group-hover:shadow-md transition-all`}>
+                                                <SafeIcon iconName={app.iconName} className={`w-6 h-6 ${app.color}`} />
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                                <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-600 transition-colors">{item.title}</h3>
-                                                <div className="flex items-center gap-2 mt-0.5">
-                                                    <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-slate-500 font-medium">{item.type}</span>
-                                                    <span className="text-xs text-slate-400">• {item.source}</span>
-                                                </div>
-                                            </div>
-                                            <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 flex-shrink-0" />
-                                        </div>
+                                            <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-center leading-tight">{app.name}</span>
+                                        </button>
                                     );
                                 })}
                             </div>
-                        ) : (
-                            <div className="text-center py-16 text-slate-400">
-                                <Search className="w-10 h-10 text-slate-200 dark:text-slate-700 mx-auto mb-3" />
-                                <p className="text-sm">Danh mục: <span className="font-bold text-slate-600 dark:text-slate-300">{searchTab}</span></p>
-                                <p className="text-xs mt-1">Chưa có kết quả trong danh mục này</p>
+                        </div>
+                    </div>
+                )}
+
+                {/* ════ SEARCH RESULTS ════ */}
+                {hasActiveSearch && activeMode === 'search' && (
+                    <div className="flex-1 overflow-y-auto px-4 py-4">
+                        <div className="max-w-3xl mx-auto">
+                            {/* Filter tabs */}
+                            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-3">
+                                {[
+                                    { id: 'all', label: 'Tất cả' },
+                                    { id: 'apps', label: 'Ứng dụng' },
+                                    { id: 'docs', label: 'Tài liệu' },
+                                    { id: 'people', label: 'Mọi người' }
+                                ].map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setSearchTab(tab.id)}
+                                        className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap border ${searchTab === tab.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:border-slate-300'}`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
                             </div>
-                        )}
+
+                            {isSearching ? (
+                                <div className="flex justify-center py-10 text-slate-400 text-sm">Đang tìm kiếm...</div>
+                            ) : searchTab === 'all' ? (
+                                <div className="space-y-3 animate-fade-in">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">Kết quả hàng đầu</p>
+                                    {SEARCH_RESULTS_MOCK.map(item => {
+                                        return (
+                                            <div key={item.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-all cursor-pointer flex items-center gap-4 group">
+                                                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700 text-blue-600 dark:text-blue-400 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors flex-shrink-0">
+                                                    <SafeIcon iconName={item.iconName} className="w-5 h-5" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-600 transition-colors">{item.title}</h3>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-slate-500 font-medium">{item.type}</span>
+                                                        <span className="text-xs text-slate-400">• {item.source}</span>
+                                                    </div>
+                                                </div>
+                                                <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 flex-shrink-0" />
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="text-center py-16 text-slate-400">
+                                    <Search className="w-10 h-10 text-slate-200 dark:text-slate-700 mx-auto mb-3" />
+                                    <p className="text-sm">Danh mục: <span className="font-bold text-slate-600 dark:text-slate-300">{searchTab}</span></p>
+                                    <p className="text-xs mt-1">Chưa có kết quả trong danh mục này</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* ════ AI CHAT MODE ════ */}
-            {activeMode === 'ai' && (
-                <div className="flex-1 flex flex-col overflow-hidden">
+                {/* ════ AI CHAT MODE ════ */}
+                {activeMode === 'ai' && (
+                    <div className="flex-1 flex flex-col overflow-hidden">
 
-                    {/* TOOL TOGGLES */}
-                    <div className="flex items-center gap-2 px-4 pt-3 pb-2 border-b border-slate-100 dark:border-slate-800 bg-[#f8fafc]/50 dark:bg-[#0f172a]/50">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Chế độ:</span>
-                        {[
-                            { key: 'search', label: 'Tìm kiếm', icon: Globe, active: 'bg-blue-100 text-blue-600 border-blue-200 dark:bg-blue-900/40 dark:text-blue-400 dark:border-blue-800' },
-                            { key: 'image', label: 'Tạo Ảnh', icon: Image, active: 'bg-purple-100 text-purple-600 border-purple-200 dark:bg-purple-900/40 dark:text-purple-400 dark:border-purple-800' },
-                            { key: 'code', label: 'Coding', icon: Code, active: 'bg-emerald-100 text-emerald-600 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-400 dark:border-emerald-800' },
-                        ].map(tool => {
-                            const Icon = tool.icon;
-                            return (
-                                <button
-                                    key={tool.key}
-                                    onClick={() => toggleTool(tool.key)}
-                                    className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold transition-all border ${activeTools[tool.key] ? tool.active : 'bg-white text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 hover:border-slate-300'}`}
-                                >
-                                    <Icon size={11} /> {tool.label}
-                                </button>
-                            );
-                        })}
-                        {/* Context Toggle */}
-                        <label className="flex items-center gap-1.5 px-2 py-1 ml-2 cursor-pointer bg-white dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 hover:border-blue-300 transition-colors">
-                            <input
-                                type="checkbox"
-                                checked={includeContext}
-                                onChange={(e) => setIncludeContext(e.target.checked)}
-                                className="w-3 h-3 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
-                            />
-                            <span className="text-[10px] font-medium text-slate-600 dark:text-slate-300 select-none">Đính kèm bối cảnh (URL)</span>
-                        </label>
+                        {/* TOOL TOGGLES */}
+                        <div className="flex items-center gap-2 px-4 pt-3 pb-2 border-b border-slate-100 dark:border-slate-800 bg-[#f8fafc]/50 dark:bg-[#0f172a]/50">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Chế độ:</span>
+                            {[
+                                { key: 'search', label: 'Tìm kiếm', icon: Globe, active: 'bg-blue-100 text-blue-600 border-blue-200 dark:bg-blue-900/40 dark:text-blue-400 dark:border-blue-800' },
+                                { key: 'image', label: 'Tạo Ảnh', icon: Image, active: 'bg-purple-100 text-purple-600 border-purple-200 dark:bg-purple-900/40 dark:text-purple-400 dark:border-purple-800' },
+                                { key: 'code', label: 'Coding', icon: Code, active: 'bg-emerald-100 text-emerald-600 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-400 dark:border-emerald-800' },
+                            ].map(tool => {
+                                const Icon = tool.icon;
+                                return (
+                                    <button
+                                        key={tool.key}
+                                        onClick={() => toggleTool(tool.key)}
+                                        className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold transition-all border ${activeTools[tool.key] ? tool.active : 'bg-white text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 hover:border-slate-300'}`}
+                                    >
+                                        <Icon size={11} /> {tool.label}
+                                    </button>
+                                );
+                            })}
+                            {/* Context Toggle */}
+                            <label className="flex items-center gap-1.5 px-2 py-1 ml-2 cursor-pointer bg-white dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 hover:border-blue-300 transition-colors">
+                                <input
+                                    type="checkbox"
+                                    checked={includeContext}
+                                    onChange={(e) => setIncludeContext(e.target.checked)}
+                                    className="w-3 h-3 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                                />
+                                <span className="text-[10px] font-medium text-slate-600 dark:text-slate-300 select-none">Đính kèm bối cảnh (URL)</span>
+                            </label>
 
-                        <button
-                            onClick={() => setIsWarehouseOpen(true)}
-                            className="ml-auto flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold transition-all border bg-white text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 hover:border-slate-300 hover:text-blue-600"
-                        >
-                            <Server size={11} /> Kho tài sản
-                        </button>
-                    </div>
+                            <button
+                                onClick={() => setIsWarehouseOpen(true)}
+                                className="ml-auto flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold transition-all border bg-white text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 hover:border-slate-300 hover:text-blue-600"
+                            >
+                                <Server size={11} /> Kho tài sản
+                            </button>
+                        </div>
 
-                    {/* MESSAGES AREA (scrollable) */}
-                    <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-                        {/* Code Canvas - only when coding mode on */}
-                        {showCodeCanvas && (
-                            <CodeCanvas
-                                onClose={() => { setShowCodeCanvas(false); setActiveTools(p => ({ ...p, code: false })); }}
-                                onOpenWarehouse={() => setIsWarehouseOpen(true)}
-                            />
-                        )}
+                        {/* MESSAGES AREA (scrollable) */}
+                        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+                            {/* Code Canvas - only when coding mode on */}
+                            {showCodeCanvas && (
+                                <CodeCanvas
+                                    onClose={() => { setShowCodeCanvas(false); setActiveTools(p => ({ ...p, code: false })); }}
+                                    onOpenWarehouse={() => setIsWarehouseOpen(true)}
+                                />
+                            )}
 
-                        {/* AI Messages */}
-                        <div className="max-w-3xl mx-auto space-y-4">
-                            {aiMessages.map(msg => (
-                                <div key={msg.id} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${msg.role === 'ai' ? 'bg-gradient-to-br from-violet-500 to-blue-600 text-white shadow-sm' : 'bg-slate-200 dark:bg-slate-700'}`}>
-                                        {msg.role === 'ai' ? <Sparkles className="w-4 h-4" /> : <User className="w-4 h-4 text-slate-500" />}
+                            {/* AI Messages */}
+                            <div className="max-w-3xl mx-auto space-y-4">
+                                {aiMessages.map(msg => (
+                                    <div key={msg.id} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${msg.role === 'ai' ? 'bg-gradient-to-br from-violet-500 to-blue-600 text-white shadow-sm' : 'bg-slate-200 dark:bg-slate-700'}`}>
+                                            {msg.role === 'ai' ? <Sparkles className="w-4 h-4" /> : <User className="w-4 h-4 text-slate-500" />}
+                                        </div>
+                                        <div className={`max-w-[80%] rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
+                                            ? 'bg-blue-600 text-white rounded-tr-sm px-4 py-3'
+                                            : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-tl-sm shadow-sm px-4 py-3 space-y-1'
+                                            }`}>
+                                            {msg.isThinking ? (
+                                                <div className="flex gap-1 h-4 items-center py-1">
+                                                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce"></span>
+                                                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></span>
+                                                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                                                </div>
+                                            ) : msg.role === 'ai' ? (
+                                                <div className={`${msg.isError ? 'text-red-400' : ''}`}>
+                                                    <AiTextRenderer text={msg.content} />
+                                                    {isAiTyping && msg.id === Math.max(...aiMessages.filter(m => m.role === 'ai').map(m => m.id)) && (
+                                                        <span className="inline-block w-0.5 h-[1em] bg-violet-400 ml-0.5 animate-pulse align-middle"></span>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <span>{msg.content}</span>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className={`max-w-[80%] rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
-                                        ? 'bg-blue-600 text-white rounded-tr-sm px-4 py-3'
-                                        : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-tl-sm shadow-sm px-4 py-3 space-y-1'
-                                        }`}>
-                                        {msg.isThinking ? (
-                                            <div className="flex gap-1 h-4 items-center py-1">
-                                                <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce"></span>
-                                                <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></span>
-                                                <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                                ))}
+                                <div ref={aiChatBottomRef} />
+                            </div>
+                        </div>
+
+                        {/* INPUT BAR (pinned to bottom with floating effect) */}
+                        <div className="flex-shrink-0 bg-transparent px-4 pb-6 pt-2">
+                            <div className="max-w-3xl mx-auto relative group">
+                                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-[1.25rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                                <div className="relative flex items-end gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 shadow-lg hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
+                                    {/* Attachment */}
+                                    <div className="relative self-end mb-0.5">
+                                        <button
+                                            onClick={e => { e.stopPropagation(); setShowAttachMenu(!showAttachMenu); }}
+                                            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 transition-colors"
+                                        >
+                                            <Paperclip className="w-4 h-4" />
+                                        </button>
+                                        {showAttachMenu && (
+                                            <div className="absolute bottom-full mb-2 left-0 w-44 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden z-50">
+                                                <div className="p-1">
+                                                    <button className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg text-left">
+                                                        <FileUp className="w-4 h-4 text-blue-500" /> Tải file lên
+                                                    </button>
+                                                    <button className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg text-left">
+                                                        <ImagePlus className="w-4 h-4 text-purple-500" /> Dán ảnh
+                                                    </button>
+                                                    <div className="h-px bg-slate-100 dark:bg-slate-700 my-1"></div>
+                                                    <button className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg text-left">
+                                                        <Database className="w-4 h-4 text-emerald-500" /> Kết nối dữ liệu
+                                                    </button>
+                                                </div>
                                             </div>
-                                        ) : msg.role === 'ai' ? (
-                                            <div className={`${msg.isError ? 'text-red-400' : ''}`}>
-                                                <AiTextRenderer text={msg.content} />
-                                                {isAiTyping && msg.id === Math.max(...aiMessages.filter(m => m.role === 'ai').map(m => m.id)) && (
-                                                    <span className="inline-block w-0.5 h-[1em] bg-violet-400 ml-0.5 animate-pulse align-middle"></span>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <span>{msg.content}</span>
                                         )}
                                     </div>
-                                </div>
-                            ))}
-                            <div ref={aiChatBottomRef} />
-                        </div>
-                    </div>
 
-                    {/* INPUT BAR (pinned to bottom with floating effect) */}
-                    <div className="flex-shrink-0 bg-transparent px-4 pb-6 pt-2">
-                        <div className="max-w-3xl mx-auto relative group">
-                            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-[1.25rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-                            <div className="relative flex items-end gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 shadow-lg hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
-                                {/* Attachment */}
-                                <div className="relative self-end mb-0.5">
-                                    <button
-                                        onClick={e => { e.stopPropagation(); setShowAttachMenu(!showAttachMenu); }}
-                                        className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 transition-colors"
-                                    >
-                                        <Paperclip className="w-4 h-4" />
-                                    </button>
-                                    {showAttachMenu && (
-                                        <div className="absolute bottom-full mb-2 left-0 w-44 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden z-50">
-                                            <div className="p-1">
-                                                <button className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg text-left">
-                                                    <FileUp className="w-4 h-4 text-blue-500" /> Tải file lên
-                                                </button>
-                                                <button className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg text-left">
-                                                    <ImagePlus className="w-4 h-4 text-purple-500" /> Dán ảnh
-                                                </button>
-                                                <div className="h-px bg-slate-100 dark:bg-slate-700 my-1"></div>
-                                                <button className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg text-left">
-                                                    <Database className="w-4 h-4 text-emerald-500" /> Kết nối dữ liệu
-                                                </button>
-                                            </div>
+                                    {/* Text input */}
+                                    {isVoiceMode ? (
+                                        <div className="flex-1 flex items-center gap-3 px-2 py-1">
+                                            <span className="text-sm font-bold text-indigo-500 animate-pulse">Đang nghe...</span>
+                                            <button onClick={() => setIsVoiceMode(false)} className="ml-auto p-1 hover:bg-red-50 dark:hover:bg-red-900/30 rounded text-slate-400 hover:text-red-500 transition-colors">
+                                                <StopCircle className="w-4 h-4" />
+                                            </button>
                                         </div>
+                                    ) : (
+                                        <textarea
+                                            ref={aiInputRef}
+                                            rows={1}
+                                            className="flex-1 bg-transparent outline-none text-slate-800 dark:text-white placeholder-slate-400 text-base py-1.5 resize-none max-h-32 overflow-y-auto leading-relaxed"
+                                            placeholder="Hỏi RinoEdu AI bất cứ điều gì..."
+                                            value={query}
+                                            onChange={e => {
+                                                setQuery(e.target.value);
+                                                e.target.style.height = 'auto';
+                                                e.target.style.height = Math.min(e.target.scrollHeight, 128) + 'px';
+                                            }}
+                                            onKeyDown={e => {
+                                                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAiSend(); }
+                                            }}
+                                        />
                                     )}
-                                </div>
 
-                                {/* Text input */}
-                                {isVoiceMode ? (
-                                    <div className="flex-1 flex items-center gap-3 px-2 py-1">
-                                        <span className="text-sm font-bold text-indigo-500 animate-pulse">Đang nghe...</span>
-                                        <button onClick={() => setIsVoiceMode(false)} className="ml-auto p-1 hover:bg-red-50 dark:hover:bg-red-900/30 rounded text-slate-400 hover:text-red-500 transition-colors">
-                                            <StopCircle className="w-4 h-4" />
+                                    {/* Right actions */}
+                                    <div className="flex items-center gap-1 self-end mb-0.5">
+                                        {!isVoiceMode && (
+                                            <button onClick={() => setIsVoiceMode(true)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-indigo-500 transition-colors" title="Giọng nói">
+                                                <Headphones className="w-4 h-4" />
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={handleAiSend}
+                                            disabled={isAiTyping || !query.trim()}
+                                            className={`p-2 rounded-xl text-white transition-all ${isAiTyping || !query.trim() ? 'bg-slate-300 dark:bg-slate-600 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-sm hover:shadow-blue-500/20'}`}
+                                        >
+                                            <Send className="w-4 h-4" />
                                         </button>
                                     </div>
-                                ) : (
-                                    <textarea
-                                        ref={aiInputRef}
-                                        rows={1}
-                                        className="flex-1 bg-transparent outline-none text-slate-800 dark:text-white placeholder-slate-400 text-base py-1.5 resize-none max-h-32 overflow-y-auto leading-relaxed"
-                                        placeholder="Hỏi RinoEdu AI bất cứ điều gì..."
-                                        value={query}
-                                        onChange={e => {
-                                            setQuery(e.target.value);
-                                            e.target.style.height = 'auto';
-                                            e.target.style.height = Math.min(e.target.scrollHeight, 128) + 'px';
-                                        }}
-                                        onKeyDown={e => {
-                                            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAiSend(); }
-                                        }}
-                                    />
-                                )}
-
-                                {/* Right actions */}
-                                <div className="flex items-center gap-1 self-end mb-0.5">
-                                    {!isVoiceMode && (
-                                        <button onClick={() => setIsVoiceMode(true)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-indigo-500 transition-colors" title="Giọng nói">
-                                            <Headphones className="w-4 h-4" />
-                                        </button>
-                                    )}
-                                    <button
-                                        onClick={handleAiSend}
-                                        disabled={isAiTyping || !query.trim()}
-                                        className={`p-2 rounded-xl text-white transition-all ${isAiTyping || !query.trim() ? 'bg-slate-300 dark:bg-slate-600 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-sm hover:shadow-blue-500/20'}`}
-                                    >
-                                        <Send className="w-4 h-4" />
-                                    </button>
                                 </div>
+                                <p className="text-[10px] text-slate-400 text-center mt-2">Enter để gửi &nbsp;•&nbsp; Shift+Enter để xuống dòng &nbsp;•&nbsp; RinoEdu AI có thể mắc lỗi, hãy kiểm tra thông tin quan trọng</p>
                             </div>
-                            <p className="text-[10px] text-slate-400 text-center mt-2">Enter để gửi &nbsp;•&nbsp; Shift+Enter để xuống dòng &nbsp;•&nbsp; RinoEdu AI có thể mắc lỗi, hãy kiểm tra thông tin quan trọng</p>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )}
+            </div>
 
-        {/* MODALS */}
-        <WarehouseModal isOpen={isWarehouseOpen} onClose={() => setIsWarehouseOpen(false)} />
-    </div>
-);
+            {/* MODALS */}
+            <WarehouseModal isOpen={isWarehouseOpen} onClose={() => setIsWarehouseOpen(false)} />
+        </div>
+    );
 };
