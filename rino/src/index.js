@@ -229,7 +229,7 @@ QUY TẮC QUAN TRỌNG:
             }
         }
 
-        // ── FALLBACK ROUTE: Redirect to Frontend ──
-        return Response.redirect("http://127.0.0.1:5500/#/home", 302);
+        // ── FALLBACK ROUTE: Redirect to Frontend (Cloudflare Pages) ──
+        return Response.redirect("https://rinoedu-app.pages.dev/#/home", 302);
     },
 };
