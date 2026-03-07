@@ -2,7 +2,7 @@
 const { useState } = React;
 
 window.Components.AccountSettings = ({ isDarkMode }) => {
-    const { Globe, Bell, Calendar, Lock, Mail, Smartphone, Globe2, Monitor, Eye, History, Shield, Trash2, CheckCircle2, ChevronRight } = window.Icons;
+    const { Globe, Bell, Calendar, Lock, Mail, Smartphone, Globe2, Monitor, Eye, History, Shield, Trash2, CheckCircle2, ChevronRight } = window.Icons || {};
 
     const [generalSettings, setGeneralSettings] = useState({
         language: window.currentLanguage || 'vi',

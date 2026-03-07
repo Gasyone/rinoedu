@@ -2,7 +2,7 @@
 const { useState } = React;
 
 window.Components.AccountSecurity = ({ isDarkMode }) => {
-    const { Key, ChevronDown, Smartphone, MessageSquare, Shield, List, Monitor, LogOut, History, Users, Grid3x3, QrCode } = window.Icons;
+    const { Key, ChevronDown, Smartphone, MessageSquare, Shield, List, Monitor, LogOut, History, Users, Grid3x3, QrCode } = window.Icons || {};
 
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     const [isTwoFAEnabled, setIsTwoFAEnabled] = useState(true);

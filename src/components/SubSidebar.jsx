@@ -3,7 +3,7 @@
 const { ChevronRight, BarChart2, Users, Settings, FileText, Calendar,
     BookOpen, GraduationCap, Package, ShoppingCart, CreditCard,
     PieChart, Shield, Briefcase, Bell, CheckCircle, Activity,
-    MessageSquare, Archive, Home, Star, Clock, TrendingUp } = window.Icons;
+    MessageSquare, Archive, Home, Star, Clock, TrendingUp } = window.Icons || {};
 
 window.Components = window.Components || {};
 

@@ -2,7 +2,7 @@
 const { useState, useEffect, useRef } = React;
 
 window.Components.DevAISidebar = ({ isDarkMode, isDevAIOpen, setIsDevAIOpen }) => {
-    const { Sparkles, X, Send, ChevronRight, ChevronLeft, Terminal, Bot, Copy, Check, Link } = window.Icons;
+    const { Sparkles, X, Send, ChevronRight, ChevronLeft, Terminal, Bot, Copy, Check, Link } = window.Icons || {};
     const [query, setQuery] = useState('');
     const [includeContext, setIncludeContext] = useState(false);
     const [messages, setMessages] = useState([

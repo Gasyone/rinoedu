@@ -38,7 +38,7 @@ const SYSTEM_GLOBAL_APPS = [
 // WAREHOUSE MODAL
 // ────────────────────────────────────────────────
 const WarehouseModal = ({ isOpen, onClose }) => {
-    const { Server, X, ChevronRight, FolderPlus, Folder, FileText, Image, BookOpen, MoreHorizontal, FileUp, Plus } = window.Icons;
+    const { Server, X, ChevronRight, FolderPlus, Folder, FileText, Image, BookOpen, MoreHorizontal, FileUp, Plus } = window.Icons || {};
     const [items, setItems] = useState(INITIAL_WAREHOUSE_ITEMS);
     const [currentPath, setCurrentPath] = useState(['Kho lưu trữ']);
 
@@ -145,7 +145,7 @@ const WarehouseModal = ({ isOpen, onClose }) => {
 // CODE CANVAS — only shown when coding mode active
 // ────────────────────────────────────────────────
 const CodeCanvas = ({ onClose, onOpenWarehouse }) => {
-    const { X, Server, Maximize2, Sparkles } = window.Icons;
+    const { X, Server, Maximize2, Sparkles } = window.Icons || {};
     const [viewTab, setViewTab] = useState('preview');
     return (
         <div className="flex flex-col bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-inner mt-3">

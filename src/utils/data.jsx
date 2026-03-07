@@ -6,7 +6,7 @@
         Truck, Container, Landmark, Building, Layers, Leaf, Briefcase, UserCircle, DollarSign, Calculator, Clipboard,
         Repeat, CreditCard, Heart, GraduationCap, Coffee, MapPin, Code, PenTool, Activity, Gamepad2, Music, Anchor, User,
         Phone, Smartphone, MapIcon, Lock, Info, ExternalLink, Hash, UserCheck
-    } = window.Icons;
+    } = window.Icons || {};
 
     window.Data = {
         ALL_APP_LIBRARY: {

@@ -1,5 +1,5 @@
 // js/components/ShortcutGuideModal.jsx
-const { X, Command, Search, MessageSquare, Menu, LayoutGrid } = window.Icons;
+const { X, Command, Search, MessageSquare, Menu, LayoutGrid } = window.Icons || {};
 
 window.Components = window.Components || {};
 

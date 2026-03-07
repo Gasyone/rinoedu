@@ -1,5 +1,5 @@
 // js/components/SocialFeed.jsx
-const { Plus, ImageIcon, Smile, Globe, MoreHorizontal, ThumbsUp, MessageCircle, Share2 } = window.Icons;
+const { Plus, ImageIcon, Smile, Globe, MoreHorizontal, ThumbsUp, MessageCircle, Share2 } = window.Icons || {};
 
 window.Components = window.Components || {};
 

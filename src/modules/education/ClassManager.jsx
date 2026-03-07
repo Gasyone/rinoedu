@@ -16,7 +16,7 @@ const ClassManager = ({ activeWorkspace, isDarkMode, config }) => {
     const MOCK_CLASSES = window.Data?.MOCK_CLASSES || [];
     const MOCK_COURSE_PROCESS = window.Data?.MOCK_COURSE_PROCESS || [];
     const MOCK_CLASS_LIBRARY = window.Data?.MOCK_CLASS_LIBRARY || [];
-    const Icons = window.Icons;
+    const Icons = window.Icons || {};
 
     const filteredClasses = useMemo(() => {
         if (activeClassTab === 'all') return MOCK_CLASSES.filter(c => c.status !== 'Đã kết thúc');

@@ -2,7 +2,7 @@
 const { useState } = React;
 
 window.Components.AccountProfile = ({ currentUser, isDarkMode }) => {
-    const { Check, PenSquare, Shield } = window.Icons;
+    const { Check, PenSquare, Shield } = window.Icons || {};
     const [isEditingProfile, setIsEditingProfile] = useState(false);
 
     return (

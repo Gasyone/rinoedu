@@ -4,7 +4,7 @@
 const CenterOps = ({ activeWorkspace, isDarkMode, config }) => {
     const { useState } = React;
     const t = (key) => window.i18n.t(key);
-    const Icons = window.Icons;
+    const Icons = window.Icons || {};
 
     // Use Mock Data from window.Data if available, fallback to empty arrays
     const MOCK_BRANCHES = window.Data?.MOCK_BRANCHES || [];

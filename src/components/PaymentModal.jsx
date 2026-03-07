@@ -1,6 +1,6 @@
 // js/components/PaymentModal.jsx
 const { useState } = React;
-const { CreditCard, Loader2 } = window.Icons;
+const { CreditCard, Loader2 } = window.Icons || {};
 
 window.Components = window.Components || {};
 

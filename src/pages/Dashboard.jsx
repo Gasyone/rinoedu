@@ -1,5 +1,5 @@
 // js/components/Dashboard.jsx
-const { Cloud, Plus, CreditCard, CheckCircle, Briefcase, FileText, Activity } = window.Icons;
+const { Cloud, Plus, CreditCard, CheckCircle, Briefcase, FileText, Activity } = window.Icons || {};
 const { useState: useDashState, useEffect: useDashEffect } = React;
 
 window.Components = window.Components || {};

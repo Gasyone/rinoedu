@@ -3,11 +3,7 @@
 const { useState, useRef } = React;
 
 window.WarehouseModule = ({ isDarkMode }) => {
-    const {
-        Server, FolderPlus, FileUp, Search, Grid3x3, List, MoreHorizontal,
-        Folder, FileText, Image, BookOpen, Trash2, Download, X, Check,
-        ChevronRight, Home, ArrowLeft, Upload, Clock, Database
-    } = window.Icons;
+    const { Plus, Search, Filter, MoreHorizontal, Download, Edit2, Trash2, ChevronRight, Home, Users, Settings, Package, ShoppingCart, TrendingUp } = window.Icons || {};
 
     const INITIAL_ITEMS = [
         { id: 'dir1', name: 'Kế hoạch học kỳ 2024', type: 'folder', date: '2 ngày trước', size: '12 files', color: 'text-blue-500', starred: true },
@@ -271,8 +267,8 @@ window.WarehouseModule = ({ isDarkMode }) => {
                                     key={item.id}
                                     onClick={() => toggleSelect(item.id)}
                                     className={`group relative p-4 rounded-2xl border cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md ${isSelected
-                                            ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20 shadow-sm'
-                                            : `${isDarkMode ? 'bg-slate-800 border-slate-700 hover:border-slate-500' : 'bg-white border-slate-100 hover:border-blue-200'}`
+                                        ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20 shadow-sm'
+                                        : `${isDarkMode ? 'bg-slate-800 border-slate-700 hover:border-slate-500' : 'bg-white border-slate-100 hover:border-blue-200'}`
                                         }`}
                                 >
                                     {isSelected && (
@@ -322,8 +318,8 @@ window.WarehouseModule = ({ isDarkMode }) => {
                                             key={item.id}
                                             onClick={() => toggleSelect(item.id)}
                                             className={`group cursor-pointer transition-colors ${isSelected
-                                                    ? 'bg-blue-50 dark:bg-blue-900/20'
-                                                    : `${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-50/80'} bg-white dark:bg-slate-900/30`
+                                                ? 'bg-blue-50 dark:bg-blue-900/20'
+                                                : `${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-50/80'} bg-white dark:bg-slate-900/30`
                                                 }`}
                                         >
                                             <td className="px-4 py-3">

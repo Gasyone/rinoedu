@@ -1,6 +1,6 @@
 // js/components/GlobalSearch.jsx
 const { useState: useSearchState, useEffect: useSearchEffect, useRef: useSearchRef, useMemo: useSearchMemo } = React;
-const { Search, X, Plus, Sparkles, ArrowRight, Command } = window.Icons;
+const { Search, X, Plus, Sparkles, ArrowRight, Command } = window.Icons || {};
 
 window.Components = window.Components || {};
 

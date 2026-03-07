@@ -1,5 +1,5 @@
 // js/components/WorkspaceLoader.jsx
-const { LayoutGrid } = window.Icons;
+const { LayoutGrid } = window.Icons || {};
 
 window.Components = window.Components || {};
 
