@@ -1,16 +1,17 @@
 /**
- * Rino Worker — Reverse Proxy + AI Endpoint (OpenAI GPT-4o-mini)
+ * Rinoapp MCP Worker — Reverse Proxy + AI Endpoint
  * 
  * This Worker serves two purposes:
  * 1. Proxies all web requests to the Cloudflare Tunnel
- * 2. Provides AI chat endpoint at /mcp/v1/chat, powered by OpenAI
+ * 2. Provides AI chat endpoint at /mcp/v1/chat, integrated with Confluence API
  */
 
 const TUNNEL_ORIGIN = "https://67abe048-6e57-4883-b4a7-ebff1b1cbba6.cfargotunnel.com";
-const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
-const OPENAI_MODEL = "gpt-4o-mini";
 
 // --- Atlassian Confluence Config ---
+// ⚠️  SECURITY: Credentials are loaded from Cloudflare Worker Secrets (env.*)
+// To set: wrangler secret put CONFLUENCE_EMAIL
+// To set: wrangler secret put CONFLUENCE_API_TOKEN
 const CONFLUENCE_DOMAIN = "https://rinoeduai.atlassian.net";
 
 
@@ -56,71 +57,39 @@ async function countConfluenceSpaces(env) {
         const count = data.size || (data.results ? data.results.length : 0);
         let spaceNames = [];
         if (data.results) spaceNames = data.results.map(s => s.name);
+
         return JSON.stringify({ message: `Found ${count} workspaces.`, workspace_names: spaceNames });
     } catch (e) {
         return `EXCEPTION: ${e.message} Stack: ${e.stack}`;
     }
 }
 
-// ── OpenAI Function Calling Tool Definitions ──
-const openaiTools = [
+// ── Define AI Tools Schema ──
+const agentTools = [
     {
-        type: "function",
-        function: {
-            name: "confluence_search",
-            description: "Search the Atlassian Confluence documentation for technical documentation, design specs, and requirements.",
-            parameters: {
-                type: "object",
-                properties: {
-                    query: { type: "string", description: "The search query" }
-                },
-                required: ["query"]
-            }
+        name: "confluence_search",
+        description: "Search the Atlassian Confluence documentation for technical documentation, design specs, and requirements.",
+        parameters: {
+            type: "object",
+            properties: {
+                query: {
+                    type: "string",
+                    description: "The search query, e.g., 'API integration' or 'database schema'"
+                }
+            },
+            required: ["query"]
         }
     },
     {
-        type: "function",
-        function: {
-            name: "confluence_count_spaces",
-            description: "Count the total number of Workspaces on Atlassian Confluence and list their names.",
-            parameters: {
-                type: "object",
-                properties: {},
-                required: []
-            }
+        name: "confluence_count_spaces",
+        description: "Count the total number of Space (Workspaces) currently available on the Atlassian Confluence system and list their basic names.",
+        parameters: {
+            type: "object",
+            properties: {},
+            required: []
         }
     }
 ];
-
-// ── Call OpenAI Chat Completions API ──
-async function callOpenAI(messages, env, useTools = true) {
-    const body = {
-        model: OPENAI_MODEL,
-        messages: messages,
-        temperature: 0.7,
-        max_tokens: 1500,
-    };
-    if (useTools) {
-        body.tools = openaiTools;
-        body.tool_choice = "auto";
-    }
-
-    const response = await fetch(OPENAI_API_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${env.OPENAI_API_KEY}`,
-        },
-        body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`OpenAI API Error ${response.status}: ${errText}`);
-    }
-
-    return await response.json();
-}
 
 export default {
     async fetch(request, env, ctx) {
@@ -147,42 +116,70 @@ export default {
             });
         }
 
-        // AI Chat Endpoint — Powered by OpenAI GPT-4o-mini
+        // AI Chat Endpoint with Confluence Agent Integration
         if (url.pathname === "/mcp/v1/chat" && request.method === "POST") {
             try {
                 const body = await request.json();
                 const userQuery = body.message || "";
                 const contextParams = body.context || {};
-                const currentPath = contextParams.path || "";
-                const messageHistory = body.messages || [];
+                const currentPath = contextParams.path || "Không có";
+                const messageHistory = body.messages || []; // Support full history
 
-                let systemPrompt = `Bạn là RinoEdu AI — trợ lý thông minh của nền tảng quản lý giáo dục RinoEdu.
+                let systemPrompt = `You are an autonomous AI Agent named RinoEdu AI, assisting users and developers on the RinoEdu platform.
+You MUST answer in Vietnamese. 
 
-QUY TẮC QUAN TRỌNG:
-1. Luôn trả lời bằng tiếng Việt.
-2. KHÔNG BAO GIỜ tự giới thiệu hoặc lặp lại câu chào "Xin chào! Tôi là RinoEdu AI..." trừ khi người dùng nói "bạn là ai" hoặc "giới thiệu bản thân". Khi người dùng hỏi câu hỏi, hãy trả lời thẳng vào nội dung.
-3. Nếu người dùng hỏi về tài liệu, wiki, kiến trúc hệ thống hoặc thông tin kỹ thuật, hãy sử dụng các tool Confluence được cung cấp.
-4. Trả lời ngắn gọn, rõ ràng, có cấu trúc Markdown.
+1. NORMAL CHAT: If the user greets you (e.g., "hello", "hi") or asks general questions, reply normally and friendly. DO NOT mention Confluence or apologize for any lack of access. 
 
-KIẾN THỨC HỆ THỐNG (WHITE DOC):
-RinoEdu sử dụng kiến trúc "Modular Monolith":
-- Frontend: React SPA (chia module: /iam, /hr, /comms, /education, /mdm, /crm, /logistics, /fintech)
-- Backend: mock-server (json-server) cho giai đoạn demo
-- API Contract: khai báo tại /src/shared/interfaces/
-- Quy tắc db.json: bảng phải có tiền tố module (iam_users, crm_leads...)
-- LUẬT: CẤM truy vấn chéo giữa các module DB. Giao tiếp qua DTOs.`;
+2. USING TOOLS: You have access to Atlassian Confluence tools.
+If the user explicitly asks to search for documents, wikis, workspaces, or technical knowledge, you MUST NOT answer directly. Instead, you MUST output ONLY a JSON tool call exactly like this:
+{"name": "confluence_search", "arguments": {"query": "search keywords"}}
 
-                if (currentPath) {
-                    systemPrompt += `\n\nNgữ cảnh: User đang ở URL: \`${currentPath}\`.`;
+3. ARCHITECTURE RULES (WHITE DOC):
+You are aware that RinoEdu uses a "Modular Monolith" architecture.
+Below is the official Whitepaper for RinoEdu. Memorize it and strictly enforce it when discussing architecture or code with developers.
+
+--- START OF WHITE DOC ---
+# TÀI LIÊU KIẾN TRÚC MẪU (WHITE DOC) DÀNH CHO TEAM BACKEND (CHÍNH THỨC)
+
+## 1. MỤC ĐÍCH GIAI ĐOẠN DEMO
+* **Frontend:** React SPA (chia module chặt chẽ theo chuẩn Modular Monolith).
+* **Backend:** Sử dụng \`mock-server\` (\`json-server\`) trả về dữ liệu mẫu.
+
+## 2. CHUẨN MỰC GIAO TIẾP (API CONTRACT & MOCK-SERVER)
+* **Nơi khai báo Contract:** \`/src/shared/interfaces/\`
+* **Qui tắc:** \`fe\` bắt buộc phải import Type/Interface từ \`/src/shared/interfaces/\`, không hardcode.
+* **Quy tắc \`db.json\`:** Bảng nào thuộc module nào, phải có tiền tố của module đó (VD: \`iam_users\`, \`crm_leads\`).
+
+## 3. THIẾT KẾ CẤU TRÚC THƯ MỤC
+* \`/iam\` (Quản lý User, Role, Phân quyền)
+* \`/hr\` (Quản trị nhân sự)
+* \`/comms\` (Giao tiếp, Thông báo)
+* \`/education\` (Khóa học, Lớp học)
+* \`/mdm\` (Master Data Management: Tài sản)
+* \`/crm\` (Khách hàng, Lead)
+* \`/logistics\`
+* \`/fintech\`
+
+## 4. LUẬT SỐNG CÒN
+* CẤM truy vấn chéo (Cross-module query) giữa các DB của các module.
+* Giao tiếp giữa UI và Backend phải qua DTOs.
+--- END OF WHITE DOC ---
+
+Always format your final responses using Markdown. Do not include tool syntax in your final conversational response.`;
+
+                if (currentPath !== "Không có") {
+                    systemPrompt += `\n\nNgữ cảnh hiện hành: User đang ở URL: \`${currentPath}\`.`;
                 }
 
-                // Build messages array
+                // Build dialogue history
                 const messages = [
                     { role: "system", content: systemPrompt }
                 ];
 
+                // Append history if provided by client, otherwise just use the single turn
                 if (messageHistory.length > 0) {
                     for (const msg of messageHistory) {
+                        // Skip system messages from client just in case
                         if (msg.role !== "system") {
                             messages.push({
                                 role: msg.role === "ai" ? "assistant" : "user",
@@ -194,61 +191,79 @@ RinoEdu sử dụng kiến trúc "Modular Monolith":
                     messages.push({ role: "user", content: userQuery });
                 }
 
-                // --- OpenAI AGENT LOOP with Function Calling ---
-                const MAX_ITERATIONS = 3;
+                // --- AGENT RE-ACT LOOP ---
+                const MAX_ITERATIONS = 4;
                 let iteration = 0;
                 let finalReply = "Xin lỗi, tôi không thể xử lý yêu cầu lúc này.";
 
                 while (iteration < MAX_ITERATIONS) {
                     iteration++;
 
-                    const data = await callOpenAI(messages, env, iteration <= 2);
-                    const choice = data.choices?.[0];
+                    const response = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+                        messages: messages,
+                        tools: agentTools
+                    });
 
-                    if (!choice) {
-                        finalReply = "Lỗi: Không nhận được phản hồi từ AI.";
-                        break;
+                    console.log(`[ITERATION ${iteration}] RAW AI RESPONSE:`, JSON.stringify(response, null, 2));
+
+                    let toolCalls = response.tool_calls || [];
+
+                    // Fallback manual parsing for Llama-3 raw JSON tool calls in text
+                    if (toolCalls.length === 0 && response.response) {
+                        const str = response.response;
+                        const regex = /{"name":\s*"([^"]+)",\s*"arguments":\s*({[^}]*})}/g;
+                        let match;
+                        while ((match = regex.exec(str)) !== null) {
+                            try {
+                                toolCalls.push({
+                                    name: match[1],
+                                    arguments: JSON.parse(match[2])
+                                });
+                            } catch (e) { }
+                        }
                     }
 
-                    const assistantMsg = choice.message;
+                    // Check if AI decided to call a tool
+                    if (toolCalls.length > 0) {
+                        // Add AI's tool call request to history as assistant message
+                        messages.push({
+                            role: "assistant",
+                            content: `Tôi đang gọi tool: ${toolCalls[0].name}`
+                        });
 
-                    // Check if GPT wants to call a function
-                    if (assistantMsg.tool_calls && assistantMsg.tool_calls.length > 0) {
-                        // Add the assistant's tool_calls message to history
-                        messages.push(assistantMsg);
-
-                        // Execute each tool call and add results
-                        for (const tc of assistantMsg.tool_calls) {
-                            const fnName = tc.function.name;
-                            let args = {};
-                            try { args = JSON.parse(tc.function.arguments); } catch (e) { }
-
+                        // Execute all requested tools
+                        for (const toolCall of toolCalls) {
+                            const params = toolCall.arguments || {};
                             let toolResult = "";
+
                             try {
-                                if (fnName === "confluence_search") {
-                                    toolResult = await searchConfluence(args.query, env);
-                                } else if (fnName === "confluence_count_spaces") {
+                                if (toolCall.name === "confluence_search") {
+                                    toolResult = await searchConfluence(params.query, env);
+                                } else if (toolCall.name === "confluence_count_spaces") {
                                     toolResult = await countConfluenceSpaces(env);
                                 } else {
-                                    toolResult = JSON.stringify({ error: "Unknown tool: " + fnName });
+                                    toolResult = JSON.stringify({ error: "Unknown tool: " + toolCall.name });
                                 }
                             } catch (err) {
                                 toolResult = JSON.stringify({ error: err.message });
                             }
 
-                            // Add tool result using the proper "tool" role
+                            // Inject tool result back into messages as a USER message so Llama 3 won't crash on invalid tool format
                             messages.push({
-                                role: "tool",
-                                tool_call_id: tc.id,
-                                content: toolResult
+                                role: "user",
+                                content: `Kết quả từ tool [${toolCall.name}]:\n${toolResult}\n\nHãy tạo câu trả lời cuối cùng cho người dùng dựa trên dữ liệu trên.`
                             });
                         }
-                        // Loop continues — GPT will now generate a response using tool results
+                        // Loop continues to let AI generate a response based on the tool result
                     } else {
-                        // GPT provided a final text response
-                        finalReply = assistantMsg.content || finalReply;
+                        // AI provided a final text response. Clean up any stray JSON blocks in the final reply.
+                        finalReply = (response.response || "").replace(/{"name":\s*"[^"]+",\s*"arguments":\s*{[^}]*}}/g, "").trim();
                         break;
                     }
+                }
+
+                if (iteration >= MAX_ITERATIONS) {
+                    finalReply += "\n\n(Lưu ý: Agent đã chạm đến giới hạn tư duy và dừng lại sớm. Một số thông tin có thể chưa đầy đủ.)";
                 }
 
                 return new Response(JSON.stringify({

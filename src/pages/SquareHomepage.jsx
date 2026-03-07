@@ -554,7 +554,6 @@ window.Components.SquareHomepage = ({
                             <p className="text-[10px] font-bold text-slate-400 uppercase text-center mb-4 tracking-wider">Truy cập nhanh</p>
                             <div className="flex flex-wrap justify-center gap-6">
                                 {SYSTEM_GLOBAL_APPS.map(app => {
-                                    const AppIcon = window.Icons[app.iconName];
                                     return (
                                         <button
                                             key={app.id}
@@ -605,7 +604,6 @@ window.Components.SquareHomepage = ({
                                 <div className="space-y-3 animate-fade-in">
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">Kết quả hàng đầu</p>
                                     {SEARCH_RESULTS_MOCK.map(item => {
-                                        const ItemIcon = window.Icons[item.iconName];
                                         return (
                                             <div key={item.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-all cursor-pointer flex items-center gap-4 group">
                                                 <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700 text-blue-600 dark:text-blue-400 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors flex-shrink-0">

@@ -48,7 +48,6 @@ window.Components.AccountManager = ({ currentUser, isDarkMode, setIsDarkMode, is
                             <div className="px-3 mb-2 text-xs font-bold text-slate-400 uppercase tracking-wider">{group}</div>
                             <ul className="space-y-1">
                                 {visibleTabs.filter(t => t.category === group).map(tab => {
-                                    const TabIcon = window.Icons[tab.iconName] || window.Icons.Box;
                                     return (
                                         <li key={tab.id}>
                                             <div
