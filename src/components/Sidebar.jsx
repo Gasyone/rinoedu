@@ -1,13 +1,12 @@
 // js/components/Sidebar.jsx
-const { LayoutGrid, Home, Plus, Activity, FileText, Settings, ChevronsRight, ChevronsLeft, Grid3x3 } = window.Icons;
-
 window.Components = window.Components || {};
 
 window.Components.Sidebar = ({
     isSidebarOpen, setIsSidebarOpen, activeModuleId, handleOpenApp,
     pinnedAppIds, isDarkMode, setShowAppLauncher, currentApp, setHoverTooltip
 }) => {
-    const ALL_APP_LIBRARY = window.Data.ALL_APP_LIBRARY;
+    const { LayoutGrid, Home, Plus, Activity, FileText, Settings, ChevronsRight, ChevronsLeft, Grid3x3 } = window.Icons || {};
+    const ALL_APP_LIBRARY = window.Data?.ALL_APP_LIBRARY || {};
 
     return (
         <>

@@ -1,8 +1,11 @@
 // js/components/UserMenu.jsx
-const { useState } = React;
-const { ChevronDown, Search, User, Building, Check, MapPin, Settings, Moon, Sun, LayoutGrid, Bell, LogOut } = window.Icons;
-
 window.Components = window.Components || {};
+
+const SafeIcon = ({ iconName, className = "" }) => {
+    const IconComponent = window.Icons && window.Icons[iconName];
+    if (IconComponent) return <IconComponent className={className} />;
+    return <div className={`w-4 h-4 bg-slate-200 rounded-sm animate-pulse ${className}`} title={`Missing icon: ${iconName}`}></div>;
+};
 
 window.Components.UserMenu = ({
     showUserMenu, setShowUserMenu, isDarkMode, setIsDarkMode,
@@ -11,6 +14,7 @@ window.Components.UserMenu = ({
     workStatus, setWorkStatus, showLocationModal, setShowLocationModal,
     showSettingsModal, setShowSettingsModal, onOpenApp, onLogout, currentUser
 }) => {
+    const { ChevronDown, Search, User, Building, Check, MapPin, Settings, Moon, Sun, LayoutGrid, Bell, LogOut } = window.Icons || {};
     const WORK_LOCATIONS = window.Data.WORK_LOCATIONS;
     const [lang, setLang] = useState('vi');
 

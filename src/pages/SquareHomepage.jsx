@@ -1,6 +1,10 @@
-// src/pages/SquareHomepage.jsx
-const { useState, useEffect, useRef } = React;
-const { Check, Copy } = window.Icons;
+const { useState, useEffect, useRef, useMemo } = React;
+
+const SafeIcon = ({ iconName, className = "" }) => {
+    const IconComponent = window.Icons && window.Icons[iconName];
+    if (IconComponent) return <IconComponent className={className} />;
+    return <div className={`w-4 h-4 bg-slate-200 rounded-sm animate-pulse ${className}`} title={`Missing icon: ${iconName}`}></div>;
+};
 
 // ────────────────────────────────────────────────
 // MOCK DATA
@@ -189,8 +193,8 @@ window.Components.SquareHomepage = ({
     const {
         Zap, Search, Paperclip, FileUp, ImagePlus, Database, Headphones, StopCircle,
         Send, Sparkles, User, Server, Globe, Image, Code, ArrowUpRight,
-        LayoutGrid, X, Bot, MessageSquare
-    } = window.Icons;
+        LayoutGrid, X, Bot, MessageSquare, Check, Copy
+    } = window.Icons || {};
 
     const [activeMode, setActiveMode] = useState('search'); // 'search' | 'ai'
     const [searchTab, setSearchTab] = useState('all');
@@ -562,7 +566,7 @@ window.Components.SquareHomepage = ({
                                             className="flex flex-col items-center gap-2 group transition hover:-translate-y-1 w-20"
                                         >
                                             <div className={`w-12 h-12 rounded-2xl ${app.bg} flex items-center justify-center shadow-sm group-hover:shadow-md transition-all`}>
-                                                {AppIcon ? <AppIcon className={`w-6 h-6 ${app.color}`} /> : null}
+                                                <SafeIcon iconName={app.iconName} className={`w-6 h-6 ${app.color}`} />
                                             </div>
                                             <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-center leading-tight">{app.name}</span>
                                         </button>
@@ -605,7 +609,7 @@ window.Components.SquareHomepage = ({
                                         return (
                                             <div key={item.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-all cursor-pointer flex items-center gap-4 group">
                                                 <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700 text-blue-600 dark:text-blue-400 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors flex-shrink-0">
-                                                    {ItemIcon ? <ItemIcon className="w-5 h-5" /> : <div className="w-5 h-5" />}
+                                                    <SafeIcon iconName={item.iconName} className="w-5 h-5" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-600 transition-colors">{item.title}</h3>

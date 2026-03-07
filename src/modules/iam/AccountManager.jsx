@@ -2,8 +2,15 @@
 const { useState, useMemo } = React;
 
 window.Components = window.Components || {};
+
+const SafeIcon = ({ iconName, className = "" }) => {
+    const IconComponent = window.Icons && window.Icons[iconName];
+    if (IconComponent) return <IconComponent className={className} />;
+    return <div className={`w-4 h-4 bg-slate-200 rounded-sm animate-pulse ${className}`} title={`Missing icon: ${iconName}`}></div>;
+};
+
 window.Components.AccountManager = ({ currentUser, isDarkMode, setIsDarkMode, isExpandedMode, setIsExpandedMode }) => {
-    const { ACCOUNT_TABS } = window.Data;
+    const ACCOUNT_TABS = window.Data?.ACCOUNT_TABS || [];
     const [activeTab, setActiveTab] = useState('profile');
 
     const visibleTabs = ACCOUNT_TABS;
@@ -48,7 +55,7 @@ window.Components.AccountManager = ({ currentUser, isDarkMode, setIsDarkMode, is
                                                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-colors ${activeTab === tab.id ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:hover:bg-slate-800'}`}
                                                 onClick={() => setActiveTab(tab.id)}
                                             >
-                                                <TabIcon className="w-4 h-4" />
+                                                <SafeIcon iconName={tab.iconName} className="w-4 h-4" />
                                                 <span>{tab.label}</span>
                                             </div>
                                         </li>

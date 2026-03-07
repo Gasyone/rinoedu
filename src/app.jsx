@@ -315,28 +315,30 @@ function App() {
     if (currentView === 'square') {
         return (
             <div className="flex h-screen w-full relative">
-                <window.Components.SquareHomepage
-                    isAuthenticated={isAuthenticated}
-                    currentUser={currentUser}
-                    onNavigateLogin={() => setCurrentView('login')}
-                    onNavigateDashboard={() => {
-                        const pendingModule = sessionStorage.getItem('rino_pending_module');
-                        sessionStorage.removeItem('rino_pending_module');
-                        setActiveModuleId(pendingModule || 'dashboard');
-                        setCurrentView('workspace');
-                    }}
-                    onLogout={() => {
-                        localStorage.removeItem('rino_auth_session');
-                        localStorage.removeItem('rino_auth_token');
-                        localStorage.removeItem('rino_user_profile');
-                        setIsAuthenticated(false);
-                        setCurrentView('square');
-                    }}
-                    showAppLauncher={showAppLauncher}
-                    setShowAppLauncher={setShowAppLauncher}
-                    isDevAIOpen={isDevAIOpen}
-                    setIsDevAIOpen={setIsDevAIOpen}
-                />
+                {window.Components.SquareHomepage ? (
+                    <window.Components.SquareHomepage
+                        isAuthenticated={isAuthenticated}
+                        currentUser={currentUser}
+                        onNavigateLogin={() => setCurrentView('login')}
+                        onNavigateDashboard={() => {
+                            const pendingModule = sessionStorage.getItem('rino_pending_module');
+                            sessionStorage.removeItem('rino_pending_module');
+                            setActiveModuleId(pendingModule || 'dashboard');
+                            setCurrentView('workspace');
+                        }}
+                        onLogout={() => {
+                            localStorage.removeItem('rino_auth_session');
+                            localStorage.removeItem('rino_auth_token');
+                            localStorage.removeItem('rino_user_profile');
+                            setIsAuthenticated(false);
+                            setCurrentView('square');
+                        }}
+                        showAppLauncher={showAppLauncher}
+                        setShowAppLauncher={setShowAppLauncher}
+                        isDevAIOpen={isDevAIOpen}
+                        setIsDevAIOpen={setIsDevAIOpen}
+                    />
+                ) : <div className="h-screen w-full flex items-center justify-center bg-slate-50 dark:bg-slate-900 text-slate-400">Đang khởi tạo RinoEdu...</div>}
 
                 {/* Re-using the same global menus on top of the SquareHomepage */}
                 {showUserMenu && isAuthenticated && (
@@ -396,44 +398,48 @@ function App() {
                 )}
 
                 {/* Dev AI Sidebar Overlay */}
-                {isAuthenticated && <DevAISidebar isDarkMode={isDarkMode} isDevAIOpen={isDevAIOpen} setIsDevAIOpen={setIsDevAIOpen} />}
+                {isAuthenticated && window.Components.DevAISidebar && <window.Components.DevAISidebar isDarkMode={isDarkMode} isDevAIOpen={isDevAIOpen} setIsDevAIOpen={setIsDevAIOpen} />}
             </div>
         );
     }
 
     if (currentView === 'login') {
-        return (
-            <LoginWebapp onLoginSuccess={(userProfile) => {
+        return window.Components.LoginWebapp ? (
+            <window.Components.LoginWebapp onLoginSuccess={(userProfile) => {
                 setIsAuthenticated(true);
                 setCurrentUser(userProfile || { name: 'Administrator', email: 'admin@enterprise.com' });
                 setCurrentView('square');
             }} />
-        );
+        ) : <div className="h-screen w-full flex items-center justify-center bg-slate-50 dark:bg-slate-900 text-slate-400">Đang tải đăng nhập...</div>;
     }
 
     return (
         <div className="flex h-screen w-full" onClick={() => { setShowUserMenu(false); setShowSettingsModal(false); setShowLocationModal(false); setShowNotifications(false); setShowAppLauncher(false); }}>
 
             {/* LOADERS & PAYMENT MODAL */}
-            <PaymentModal
-                isOpen={paymentModalOpen}
-                app={selectedAppToBuy}
-                onClose={() => setPaymentModalOpen(false)}
-                onConfirm={handlePaymentSuccess}
-            />
+            {window.Components.PaymentModal && (
+                <window.Components.PaymentModal
+                    isOpen={paymentModalOpen}
+                    app={selectedAppToBuy}
+                    onClose={() => setPaymentModalOpen(false)}
+                    onConfirm={handlePaymentSuccess}
+                />
+            )}
 
             {/* SIDEBAR & OVERLAYS */}
-            <Sidebar
-                isSidebarOpen={isSidebarOpen}
-                setIsSidebarOpen={setIsSidebarOpen}
-                activeModuleId={activeModuleId}
-                handleOpenApp={handleOpenApp}
-                pinnedAppIds={pinnedAppIds}
-                isDarkMode={isDarkMode}
-                setShowAppLauncher={setShowAppLauncher}
-                currentApp={currentApp}
-                setHoverTooltip={setHoverTooltip}
-            />
+            {window.Components.Sidebar && (
+                <window.Components.Sidebar
+                    isSidebarOpen={isSidebarOpen}
+                    setIsSidebarOpen={setIsSidebarOpen}
+                    activeModuleId={activeModuleId}
+                    handleOpenApp={handleOpenApp}
+                    pinnedAppIds={pinnedAppIds}
+                    isDarkMode={isDarkMode}
+                    setShowAppLauncher={setShowAppLauncher}
+                    currentApp={currentApp}
+                    setHoverTooltip={setHoverTooltip}
+                />
+            )}
 
             {/* MAIN AREA */}
             <div className={`flex-1 flex flex-col md:flex-row min-w-0 transition-all duration-300 ml-0 relative overflow-hidden ${isSidebarOpen ? 'md:ml-[60px]' : 'md:ml-0'}`}>
@@ -450,25 +456,27 @@ function App() {
                 {/* CONTENT AREA WITH HEADER */}
                 <div className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto overflow-x-hidden relative">
                     {/* HEADER */}
-                    <Header
-                        currentUser={currentUser}
-                        currentApp={currentApp}
-                        isDarkMode={isDarkMode}
-                        setShowGlobalSearch={setShowGlobalSearch}
-                        showNotifications={showNotifications}
-                        setShowNotifications={setShowNotifications}
-                        unreadCount={unreadCount}
-                        showUserMenu={showUserMenu}
-                        setShowUserMenu={setShowUserMenu}
-                        setShowSettingsModal={setShowSettingsModal}
-                        setShowLocationModal={setShowLocationModal}
-                        groupedNotifications={groupedNotifications}
-                        markAsRead={markAsRead}
-                        markAllAsRead={markAllAsRead}
-                        notifications={notifications}
-                        isDevAIOpen={isDevAIOpen}
-                        setIsDevAIOpen={setIsDevAIOpen}
-                    />
+                    {window.Components.Header && (
+                        <window.Components.Header
+                            currentUser={currentUser}
+                            currentApp={currentApp}
+                            isDarkMode={isDarkMode}
+                            setShowGlobalSearch={setShowGlobalSearch}
+                            showNotifications={showNotifications}
+                            setShowNotifications={setShowNotifications}
+                            unreadCount={unreadCount}
+                            showUserMenu={showUserMenu}
+                            setShowUserMenu={setShowUserMenu}
+                            setShowSettingsModal={setShowSettingsModal}
+                            setShowLocationModal={setShowLocationModal}
+                            groupedNotifications={groupedNotifications}
+                            markAsRead={markAsRead}
+                            markAllAsRead={markAllAsRead}
+                            notifications={notifications}
+                            isDevAIOpen={isDevAIOpen}
+                            setIsDevAIOpen={setIsDevAIOpen}
+                        />
+                    )}
 
                     {/* MOBILE HORIZONTAL APP NAVIGATION (Below Header) */}
                     <div className="md:hidden h-14 bg-white dark:bg-[#111827] border-b border-slate-100 dark:border-slate-800 flex items-center px-4 gap-4 overflow-x-auto no-scrollbar sticky top-16 z-20">
@@ -525,17 +533,19 @@ function App() {
                         ) : (
                             <div className="animate-fadeIn w-full h-full">
                                 {activeModuleId === 'dashboard' ? (
-                                    <Dashboard
-                                        currentUser={currentUser}
-                                        dailyFocus={dailyFocus}
-                                        handleFocusChange={handleFocusChange}
-                                        handleFocusKeyDown={handleFocusKeyDown}
-                                        getGreeting={getGreeting}
-                                        shortcuts={shortcuts}
-                                        handleOpenApp={handleOpenApp}
-                                    />
+                                    window.Components.Dashboard ? (
+                                        <window.Components.Dashboard
+                                            currentUser={currentUser}
+                                            dailyFocus={dailyFocus}
+                                            handleFocusChange={handleFocusChange}
+                                            handleFocusKeyDown={handleFocusKeyDown}
+                                            getGreeting={getGreeting}
+                                            shortcuts={shortcuts}
+                                            handleOpenApp={handleOpenApp}
+                                        />
+                                    ) : <div className="p-12 text-center text-slate-400">Đang tải trang chủ...</div>
                                 ) : activeModuleId === 'social' ? (
-                                    <SocialFeed isExpandedMode={isExpandedMode} />
+                                    window.Components.SocialFeed ? <window.Components.SocialFeed isExpandedMode={isExpandedMode} /> : <div className="p-12 text-center text-slate-400">Đang tải bản tin...</div>
                                 ) : activeModuleId === 'account_manager' ? (
                                     window.Components.AccountManager ? (
                                         <window.Components.AccountManager
@@ -624,14 +634,16 @@ function App() {
 
             {/* MODALS */}
 
-            <ShortcutGuideModal
-                isOpen={showShortcutGuide}
-                onClose={() => setShowShortcutGuide(false)}
-                isDarkMode={isDarkMode}
-            />
+            {window.Components.ShortcutGuideModal && (
+                <window.Components.ShortcutGuideModal
+                    isOpen={showShortcutGuide}
+                    onClose={() => setShowShortcutGuide(false)}
+                    isDarkMode={isDarkMode}
+                />
+            )}
 
-            {showAppLauncher && (
-                <AppLauncher
+            {showAppLauncher && window.Components.AppLauncher && (
+                <window.Components.AppLauncher
                     myAppIds={myAppIds}
                     setMyAppIds={setMyAppIds}
                     pinnedAppIds={pinnedAppIds}
@@ -645,43 +657,47 @@ function App() {
             )
             }
 
-            <GlobalSearch
-                showGlobalSearch={showGlobalSearch}
-                onClose={() => setShowGlobalSearch(false)}
-                isDarkMode={isDarkMode}
-                setIsDevAIOpen={setIsDevAIOpen}
-            />
+            {window.Components.GlobalSearch && (
+                <window.Components.GlobalSearch
+                    showGlobalSearch={showGlobalSearch}
+                    onClose={() => setShowGlobalSearch(false)}
+                    isDarkMode={isDarkMode}
+                    setIsDevAIOpen={setIsDevAIOpen}
+                />
+            )}
 
-            <UserMenu
-                showUserMenu={showUserMenu}
-                setShowUserMenu={setShowUserMenu}
-                isDarkMode={isDarkMode}
-                setIsDarkMode={setIsDarkMode}
-                isExpandedMode={isExpandedMode}
-                setIsExpandedMode={setIsExpandedMode}
-                notificationsEnabled={notificationsEnabled}
-                setNotificationsEnabled={setNotificationsEnabled}
-                workLocation={workLocation}
-                setWorkLocation={setWorkLocation}
-                workStatus={workStatus}
-                setWorkStatus={setWorkStatus}
-                showLocationModal={showLocationModal}
-                setShowLocationModal={setShowLocationModal}
-                showSettingsModal={showSettingsModal}
-                setShowSettingsModal={setShowSettingsModal}
-                onOpenApp={handleOpenApp}
-                onLogout={() => {
-                    localStorage.removeItem('rino_auth_session');
-                    localStorage.removeItem('rino_auth_token');
-                    localStorage.removeItem('rino_user_profile');
-                    setIsAuthenticated(false);
-                    setCurrentUser(null);
-                    setCurrentView('square');
-                }}
-                currentUser={currentUser}
-                isDevAIOpen={isDevAIOpen}
-                setIsDevAIOpen={setIsDevAIOpen}
-            />
+            {window.Components.UserMenu && (
+                <window.Components.UserMenu
+                    showUserMenu={showUserMenu}
+                    setShowUserMenu={setShowUserMenu}
+                    isDarkMode={isDarkMode}
+                    setIsDarkMode={setIsDarkMode}
+                    isExpandedMode={isExpandedMode}
+                    setIsExpandedMode={setIsExpandedMode}
+                    notificationsEnabled={notificationsEnabled}
+                    setNotificationsEnabled={setNotificationsEnabled}
+                    workLocation={workLocation}
+                    setWorkLocation={setWorkLocation}
+                    workStatus={workStatus}
+                    setWorkStatus={setWorkStatus}
+                    showLocationModal={showLocationModal}
+                    setShowLocationModal={setShowLocationModal}
+                    showSettingsModal={showSettingsModal}
+                    setShowSettingsModal={setShowSettingsModal}
+                    onOpenApp={handleOpenApp}
+                    onLogout={() => {
+                        localStorage.removeItem('rino_auth_session');
+                        localStorage.removeItem('rino_auth_token');
+                        localStorage.removeItem('rino_user_profile');
+                        setIsAuthenticated(false);
+                        setCurrentUser(null);
+                        setCurrentView('square');
+                    }}
+                    currentUser={currentUser}
+                    isDevAIOpen={isDevAIOpen}
+                    setIsDevAIOpen={setIsDevAIOpen}
+                />
+            )}
 
             {/* Render Modals as Bottom Sheets ONLY on Mobile */}
             <div className="md:hidden">
@@ -734,7 +750,9 @@ function App() {
             </div>
 
             {/* Dev AI Sidebar Overlay */}
-            <DevAISidebar isDarkMode={isDarkMode} isDevAIOpen={isDevAIOpen} setIsDevAIOpen={setIsDevAIOpen} />
+            {window.Components.DevAISidebar && (
+                <window.Components.DevAISidebar isDarkMode={isDarkMode} isDevAIOpen={isDevAIOpen} setIsDevAIOpen={setIsDevAIOpen} />
+            )}
 
             {/* Hover Tooltip */}
             {

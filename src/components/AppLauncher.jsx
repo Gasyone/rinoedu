@@ -1,13 +1,12 @@
 // js/components/AppLauncher.jsx
-const { useState, useMemo } = React;
-const { LayoutGrid, Search, X, CheckCircle, Pin, PinOff, GripVertical } = window.Icons;
-
 window.Components = window.Components || {};
 
 window.Components.AppLauncher = ({
     myAppIds, setMyAppIds, pinnedAppIds, isDarkMode,
     handleOpenApp, togglePinApp, installApp, uninstallApp, onClose
 }) => {
+    const { useState, useMemo } = React;
+    const { LayoutGrid, Search, X, CheckCircle, Pin, PinOff, GripVertical } = window.Icons || {};
     const [launcherTab, setLauncherTab] = useState('my_apps');
     const [appSearchQuery, setAppSearchQuery] = useState('');
     const [activeCategory, setActiveCategory] = useState('Tất cả');

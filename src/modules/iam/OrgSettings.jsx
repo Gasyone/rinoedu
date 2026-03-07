@@ -1,3 +1,5 @@
+const { useState, useEffect, useMemo } = React;
+
 window.Components = window.Components || {};
 
 const SafeIcon = ({ iconName, className = "" }) => {

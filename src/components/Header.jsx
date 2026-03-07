@@ -1,7 +1,11 @@
 // js/components/Header.jsx
-const { Search, Bell, ChevronDown, ChevronRight } = window.Icons;
-
 window.Components = window.Components || {};
+
+const SafeIcon = ({ iconName, className = "" }) => {
+    const IconComponent = window.Icons && window.Icons[iconName];
+    if (IconComponent) return <IconComponent className={className} />;
+    return <div className={`w-4 h-4 bg-slate-200 rounded-sm animate-pulse ${className}`} title={`Missing icon: ${iconName}`}></div>;
+};
 
 window.Components.Header = ({
     currentUser, currentApp, isDarkMode, setShowGlobalSearch,
@@ -10,10 +14,11 @@ window.Components.Header = ({
     groupedNotifications, notifFilter, setNotifFilter, markAsRead, markAllAsRead,
     notifications, isDevAIOpen, setIsDevAIOpen, breadcrumb
 }) => {
+    const { Search, Bell, ChevronDown, ChevronRight } = window.Icons || {};
     const {
         Sliders, CheckSquare, X, Briefcase, Video, Shield, Check, Sparkles,
         MessageSquare, AlertCircle, Star
-    } = window.Icons;
+    } = window.Icons || {};
 
     // Work status indicator on avatar
     const workStatus = 'online'; // could be prop later
