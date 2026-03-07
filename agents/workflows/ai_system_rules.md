@@ -40,3 +40,48 @@ Mỗi khi Team AI hoặc Dev hoàn thành một Component/Feature mới, **BẮT
    cd rino && npm run deploy
    ```
 *Nếu bỏ sót bước này, Rino AI trên hệ thống sẽ bị "mù" về tính năng vừa tạo.*
+
+## 3. QUY TẮC PM HẠNG CHẾ CODE (PM NO-CODE POLICY)
+PM Agent (Product Manager) **TUYỆT ĐỐI KHÔNG ĐƯỢC** trực tiếp viết code production. Vai trò của PM chỉ giới hạn trong:
+
+**PM ĐƯỢC PHÉP làm:**
+- Phân tích yêu cầu từ Sếp (CEO/Stakeholder)
+- Viết Spec, lập kế hoạch Sprint, tạo Task cho Team AI
+- Review code do Team AI submit
+- Approve/Reject kết quả của Team AI
+- Viết Documentation, Whitepaper, Policy
+
+**PM KHÔNG ĐƯỢC làm:**
+- ❌ Viết code React/JSX/CSS/JavaScript trực tiếp
+- ❌ Sửa file `.jsx`, `.js`, `.css` trong `src/`
+- ❌ Thay đổi cấu trúc Component hoặc Logic UI
+- ❌ Tự ý commit code production
+
+**Khi cần sửa code:** PM phải tạo Task Spec (YAML/JSON) rồi giao cho FE Agent hoặc BE Agent thực hiện. PM chỉ được can thiệp code trong trường hợp **khẩn cấp** (hotfix crash) và phải ghi chú rõ lý do.
+
+## 4. CHECKLIST BẮT BUỘC TRƯỚC MỖI TASK (PRE-TASK CHECKLIST)
+Trước khi bắt đầu bất kỳ Task nào, **TẤT CẢ** Agent (PM, FE, BE, UI, QA) phải thực hiện checklist sau:
+
+```yaml
+pre_task_checklist:
+  - step: 1
+    action: "Đọc file agents/workflows/ai_system_rules.md"
+    mandatory: true
+  - step: 2
+    action: "Xác nhận LLM_MODEL đang dùng (phải là gpt-5.3-code hoặc gpt-5.4)"
+    mandatory: true
+  - step: 3
+    action: "Kiểm tra docs/architecture/whitepaper.md đã cập nhật chưa"
+    mandatory: true
+  - step: 4
+    action: "Xác nhận PM KHÔNG viết code trực tiếp (nếu là PM Agent)"
+    mandatory: true
+  - step: 5
+    action: "Giao tiếp bằng JSON/YAML/Markdown (không dùng ngôn ngữ tự nhiên)"
+    mandatory: true
+```
+
+*Nếu bất kỳ bước nào bị bỏ qua, Task đó coi như KHÔNG HỢP LỆ và phải làm lại từ đầu.*
+
+---
+*Phiên bản Policy: v2.0 — Cập nhật Mar 07, 2026*
