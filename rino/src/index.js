@@ -238,6 +238,6 @@ QUY TẮC QUAN TRỌNG:
         }
 
         // ── FALLBACK ROUTE: Redirect to Frontend ──
-        return Response.redirect("https://github.com/Gasy-headquater/rinoedu", 302);
+        return Response.redirect("http://127.0.0.1:5500/#/home", 302);
     },
 };
