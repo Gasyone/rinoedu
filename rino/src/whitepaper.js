@@ -60,6 +60,19 @@ Trang chủ RinoEdu được thiết kế theo phong cách tối giản, tập t
 - **Kho AI & Tài nguyên (Warehouse):** Quản lý tài liệu và các file được dùng cho Agent AI.
 - **Code Canvas:** Vùng hiển thị code/preview khi đang ở chế độ Coding Mode với AI.
 
+### 3.4 Giao diện Dashboard (Không gian làm việc)
+Component chính: \`src/pages/Dashboard.jsx\` (URL: \`#/dashboard\`)
+Dashboard là màn hình làm việc chính sau khi đăng nhập, bao gồm:
+- **Thẻ Chào hỏi (Greeting Card):** Câu chào "Chào buổi sáng/chiều/tối, [Tên user]!" kèm ô nhập "Tâm điểm hôm nay" để user ghi mục tiêu chính trong ngày.
+- **Widget Thời tiết:** Card thời tiết gradient tím (Hà Nội, nhiệt độ, ngày/giờ hiện tại).
+- **Truy cập nhanh (Quick Access):** Lưới các ứng dụng shortcut (cấu hình được) + nút "Thêm mới".
+- **KPI Widgets (Chỉ số quan trọng):**
+  - Số dư ví (15.000.000 VNĐ)
+  - Task cần làm (số lượng + canh báo quá hạn)
+  - Dự án active (đang chạy + deadline)
+- **Chờ phê duyệt (Pending Approvals):** Card gradient cam-đỏ hiển thị số phiếu chờ duyệt (Nghỉ phép, PO, Tạm ứng) + nút "Xử lý ngay".
+- **Hoạt động cá nhân (Activity Feed):** Timeline các hành động gần đây của user (duyệt PO, meeting, cập nhật hồ sơ...) + nút "Xem tất cả".
+
 ---
 
 ## 4. HƯỚNG DẪN TÍNH NĂNG CHI TIẾT (USER GUIDE)

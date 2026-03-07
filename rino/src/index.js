@@ -69,8 +69,16 @@ const openaiTools = [
     {
         type: "function",
         function: {
+            name: "read_whitepaper",
+            description: "ĐỌC tài liệu Sách Trắng RinoEdu — LUÔN LUÔN gọi tool này KHI người dùng hỏi về: tính năng màn hình, giao diện, UI, Homepage, Dashboard, module, kiến trúc hệ thống, component, hoặc BẤT CỨ điều gì liên quan đến nền tảng RinoEdu.",
+            parameters: { type: "object", properties: {}, required: [] }
+        }
+    },
+    {
+        type: "function",
+        function: {
             name: "confluence_search",
-            description: "Search the Atlassian Confluence documentation for technical documentation, design specs, and requirements.",
+            description: "Tìm kiếm trên Confluence — CHỈ dùng khi người dùng hỏi về dự án, sprint, task Jira, hoặc quản lý công việc. KHÔNG dùng cho câu hỏi về tính năng hoặc màn hình.",
             parameters: {
                 type: "object",
                 properties: {
@@ -84,20 +92,12 @@ const openaiTools = [
         type: "function",
         function: {
             name: "confluence_count_spaces",
-            description: "Count the total number of Workspaces on Atlassian Confluence and list their names.",
+            description: "Đếm số workspace trên Confluence — chỉ dùng khi user hỏi về workspace/space.",
             parameters: {
                 type: "object",
                 properties: {},
                 required: []
             }
-        }
-    },
-    {
-        type: "function",
-        function: {
-            name: "read_whitepaper",
-            description: "Read the official RinoEdu Architecture Whitepaper to answer technical, instructional, or structural questions about the platform (e.g., Homepage, Modules, etc.).",
-            parameters: { type: "object", properties: {}, required: [] }
         }
     }
 ];
@@ -169,12 +169,11 @@ export default {
 
 QUY TẮC QUAN TRỌNG:
 1. Luôn trả lời bằng tiếng Việt.
-2. KHÔNG BAO GIỜ tự giới thiệu hoặc lặp lại câu chào "Xin chào! Tôi là RinoEdu AI..." trừ khi người dùng nói "bạn là ai" hoặc "giới thiệu bản thân". Khi người dùng hỏi câu hỏi, hãy trả lời thẳng vào nội dung.
-3. Nếu người dùng hỏi về tài liệu, kiến trúc hệ thống, Trang chủ (Homepage), Cấu trúc nội bộ, hoặc Whitepaper, **HÃY SỬ DỤNG TOOL \`read_whitepaper\`**. Nếu người dùng hỏi các dự án / task, hãy dùng \`confluence_search\`.
+2. KHÔNG BAO GIỜ tự giới thiệu hoặc lặp lại câu chào "Xin chào! Tôi là RinoEdu AI..." trừ khi người dùng nói "bạn là ai" hoặc "giới thiệu bản thân".
+3. **QUY TẮC ƯU TIÊN TOOL**: Khi người dùng hỏi về TÍNH NĂNG, MÀN HÌNH, GIAO DIỆN, MODULE, KIẾN TRÚC, HOMEPAGE, DASHBOARD, hoặc BẤT CỨ GÌ liên quan đến sản phẩm RinoEdu → BẮT BUỘC gọi tool \`read_whitepaper\`. KHÔNG BAO GIỜ dùng \`confluence_search\` cho các câu hỏi này. Tool \`confluence_search\` CHỈ được dùng khi user hỏi về dự án, sprint, hoặc task quản lý.
 4. Trả lời ngắn gọn, rõ ràng, có cấu trúc Markdown.
-5. Khi trả lời câu hỏi về tính năng trên màn hình, hãy mô tả CHÍNH XÁC theo danh sách uiElements mà Frontend gửi lên. KHÔNG tự bịa tính năng.
-
-LUẬT QUAN TRỌNG: Không trả lời chung chung khi nói đến tính năng của RinoEdu. Gọi công cụ \`read_whitepaper\` để lấy chi tiết về tính năng như Trang Chủ, Quản trị tổ chức.`;
+5. Khi trả lời câu hỏi về tính năng trên màn hình, hãy mô tả CHÍNH XÁC theo tài liệu Whitepaper và danh sách uiElements từ Frontend. KHÔNG tự bịa tính năng.
+6. Nếu trong NGỮ CẢNH MÀN HÌNH có thông tin, hãy dùng nó để trả lời trước, sau đó bổ sung bằng Whitepaper nếu cần.`;
 
                 // Inject rich screen context into system prompt
                 if (ctx.screenName || ctx.path) {
