@@ -1,0 +1,32 @@
+.chat-window {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--color-background);
+}
+
+.dark-mode {
+    background-color: var(--color-background-dark);
+}
+
+.message-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    background-color: var(--color-background-light);
+}
+
+.dark .message-list {
+    background-color: var(--color-background-dark-light);
+}
+
+.message {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border-radius: 5px;
+}
+
+.loading, .error, .empty {
+    text-align: center;
+    color: var(--color-text);
+}

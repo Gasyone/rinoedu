@@ -293,6 +293,29 @@ window.Components.SquareHomepage = ({
             const currentUrl = window.location.href;
             const currentPath = window.location.pathname;
 
+            // Build rich screen context for AI awareness
+            const screenContext = {
+                screenName: 'SquareHomepage',
+                screenTitle: 'Trang Chủ RinoEdu',
+                url: currentUrl,
+                path: currentPath,
+                activeMode: activeMode, // 'search' | 'ai'
+                visibleQuickApps: SYSTEM_GLOBAL_APPS.map(a => a.name), // ['Đào tạo','Nhân sự','CRM','Kho tài sản','Quản lý tài khoản']
+                activeTools: Object.entries(activeTools).filter(([, v]) => v).map(([k]) => k),
+                isWarehouseOpen: isWarehouseOpen,
+                isAuthenticated: isAuthenticated,
+                currentUser: currentUser ? { name: currentUser.name, role: currentUser.role } : null,
+                uiElements: [
+                    'Logo RinoEdu (banner trung tâm)',
+                    'Thanh tìm kiếm toàn năng (Universal Search)',
+                    'Nút Hỏi AI (Sparkles icon)',
+                    'Truy cập nhanh: Đào tạo, Nhân sự, CRM, Kho tài sản, Quản lý tài khoản',
+                    'Header: App Launcher, Dashboard, Avatar',
+                    'Kho AI & Tài nguyên (Warehouse modal)',
+                    'Code Canvas (khi bật coding mode)',
+                ],
+            };
+
             // Format previous messages to send to backend (excluding thinking/error objects)
             const messageHistory = aiMessages
                 .filter(m => m.content && !m.isThinking && !m.isError)
@@ -306,11 +329,8 @@ window.Components.SquareHomepage = ({
 
             const payload = {
                 message: userMsgContent,
-                messages: messageHistory, // Send full history for Agent memory
-                context: includeContext ? {
-                    url: currentUrl,
-                    path: currentPath,
-                } : {}
+                messages: messageHistory,
+                context: screenContext
             };
 
             const response = await fetch('https://rino.gasy.io/mcp/v1/chat', {

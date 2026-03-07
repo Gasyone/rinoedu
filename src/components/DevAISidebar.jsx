@@ -89,6 +89,7 @@ window.Components.DevAISidebar = ({ isDarkMode, isDevAIOpen, setIsDevAIOpen }) =
 
         const currentUrl = window.location.href;
         const currentPath = window.location.pathname;
+        const currentHash = window.location.hash;
         const userMsgContent = query;
 
         const newUserMsg = { id: Date.now(), role: 'user', content: userMsgContent };
@@ -100,6 +101,27 @@ window.Components.DevAISidebar = ({ isDarkMode, isDevAIOpen, setIsDevAIOpen }) =
         setMessages(prev => [...prev, { id: aiMsgId, role: 'ai', content: '', isThinking: true }]);
 
         try {
+            // Detect current module from URL hash
+            const hashRoute = currentHash.replace('#/', '').split('/')[0] || 'home';
+            const MODULE_MAP = {
+                'home': 'Trang Chủ', 'dashboard': 'Dashboard', 'education': 'Quản lý Đào tạo',
+                'hr': 'Nhân sự', 'crm': 'CRM', 'mdm': 'Kho tài sản', 'fintech': 'Tài chính',
+                'comms': 'Giao tiếp', 'logistics': 'Kho vận', 'account_manager': 'Quản lý Tài khoản',
+                'iam': 'Quản trị Hệ thống'
+            };
+
+            // Build rich screen context
+            const screenContext = {
+                screenName: 'DevAISidebar',
+                screenTitle: 'Developer AI Assistant',
+                url: currentUrl,
+                path: currentPath,
+                hashRoute: hashRoute,
+                currentModule: MODULE_MAP[hashRoute] || hashRoute,
+                includeContext: includeContext,
+                role: 'developer',
+            };
+
             // Format previous messages to send to backend (excluding thinking/error objects)
             const messageHistory = messages
                 .filter(m => m.content && !m.isThinking && !m.isError)
@@ -111,16 +133,10 @@ window.Components.DevAISidebar = ({ isDarkMode, isDevAIOpen, setIsDevAIOpen }) =
             // Append the new user message
             messageHistory.push({ role: 'user', content: userMsgContent });
 
-            // Include context in the request to the worker if enabled
             const payload = {
                 message: userMsgContent,
-                messages: messageHistory, // Send full history for Agent memory
-                ...(includeContext && {
-                    context: {
-                        url: currentUrl,
-                        path: currentPath,
-                    }
-                })
+                messages: messageHistory,
+                context: screenContext
             };
 
             // Call the newly implemented Cloudflare Worker AI Endpoint

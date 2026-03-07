@@ -7,11 +7,13 @@
  */
 
 const TUNNEL_ORIGIN = "https://67abe048-6e57-4883-b4a7-ebff1b1cbba6.cfargotunnel.com";
-const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
+const OPENAI_API_URL = "https://api.openai-proxy.com/v1/chat/completions"; // Pure pass-through Proxy that accepts official OpenAI sk- keys
 const OPENAI_MODEL = "gpt-4o-mini";
 
 // --- Atlassian Confluence Config ---
 const CONFLUENCE_DOMAIN = "https://rinoeduai.atlassian.net";
+
+import { WHITEPAPER_CONTENT } from './whitepaper.js';
 
 
 async function searchConfluence(query, env) {
@@ -89,6 +91,14 @@ const openaiTools = [
                 required: []
             }
         }
+    },
+    {
+        type: "function",
+        function: {
+            name: "read_whitepaper",
+            description: "Read the official RinoEdu Architecture Whitepaper to answer technical, instructional, or structural questions about the platform (e.g., Homepage, Modules, etc.).",
+            parameters: { type: "object", properties: {}, required: [] }
+        }
     }
 ];
 
@@ -152,8 +162,7 @@ export default {
             try {
                 const body = await request.json();
                 const userQuery = body.message || "";
-                const contextParams = body.context || {};
-                const currentPath = contextParams.path || "";
+                const ctx = body.context || {};
                 const messageHistory = body.messages || [];
 
                 let systemPrompt = `Bạn là RinoEdu AI — trợ lý thông minh của nền tảng quản lý giáo dục RinoEdu.
@@ -161,19 +170,25 @@ export default {
 QUY TẮC QUAN TRỌNG:
 1. Luôn trả lời bằng tiếng Việt.
 2. KHÔNG BAO GIỜ tự giới thiệu hoặc lặp lại câu chào "Xin chào! Tôi là RinoEdu AI..." trừ khi người dùng nói "bạn là ai" hoặc "giới thiệu bản thân". Khi người dùng hỏi câu hỏi, hãy trả lời thẳng vào nội dung.
-3. Nếu người dùng hỏi về tài liệu, wiki, kiến trúc hệ thống hoặc thông tin kỹ thuật, hãy sử dụng các tool Confluence được cung cấp.
+3. Nếu người dùng hỏi về tài liệu, kiến trúc hệ thống, Trang chủ (Homepage), Cấu trúc nội bộ, hoặc Whitepaper, **HÃY SỬ DỤNG TOOL \`read_whitepaper\`**. Nếu người dùng hỏi các dự án / task, hãy dùng \`confluence_search\`.
 4. Trả lời ngắn gọn, rõ ràng, có cấu trúc Markdown.
+5. Khi trả lời câu hỏi về tính năng trên màn hình, hãy mô tả CHÍNH XÁC theo danh sách uiElements mà Frontend gửi lên. KHÔNG tự bịa tính năng.
 
-KIẾN THỨC HỆ THỐNG (WHITE DOC):
-RinoEdu sử dụng kiến trúc "Modular Monolith":
-- Frontend: React SPA (chia module: /iam, /hr, /comms, /education, /mdm, /crm, /logistics, /fintech)
-- Backend: mock-server (json-server) cho giai đoạn demo
-- API Contract: khai báo tại /src/shared/interfaces/
-- Quy tắc db.json: bảng phải có tiền tố module (iam_users, crm_leads...)
-- LUẬT: CẤM truy vấn chéo giữa các module DB. Giao tiếp qua DTOs.`;
+LUẬT QUAN TRỌNG: Không trả lời chung chung khi nói đến tính năng của RinoEdu. Gọi công cụ \`read_whitepaper\` để lấy chi tiết về tính năng như Trang Chủ, Quản trị tổ chức.`;
 
-                if (currentPath) {
-                    systemPrompt += `\n\nNgữ cảnh: User đang ở URL: \`${currentPath}\`.`;
+                // Inject rich screen context into system prompt
+                if (ctx.screenName || ctx.path) {
+                    systemPrompt += `\n\n--- NGỮ CẢNH MÀN HÌNH HIỆN TẠI ---`;
+                    if (ctx.screenName) systemPrompt += `\nMàn hình: ${ctx.screenTitle || ctx.screenName}`;
+                    if (ctx.currentModule) systemPrompt += `\nModule: ${ctx.currentModule}`;
+                    if (ctx.path) systemPrompt += `\nURL: \`${ctx.url || ctx.path}\``;
+                    if (ctx.activeMode) systemPrompt += `\nChế độ: ${ctx.activeMode}`;
+                    if (ctx.visibleQuickApps) systemPrompt += `\nTruy cập nhanh: ${ctx.visibleQuickApps.join(', ')}`;
+                    if (ctx.uiElements) systemPrompt += `\nCác thành phần UI hiển thị:\n${ctx.uiElements.map(e => '- ' + e).join('\n')}`;
+                    if (ctx.isAuthenticated !== undefined) systemPrompt += `\nĐăng nhập: ${ctx.isAuthenticated ? 'Đã đăng nhập' : 'Chưa đăng nhập'}`;
+                    if (ctx.currentUser) systemPrompt += `\nUser: ${ctx.currentUser.name} (${ctx.currentUser.role || 'N/A'})`;
+                    if (ctx.role) systemPrompt += `\nVai trò người hỏi: ${ctx.role}`;
+                    systemPrompt += `\n--- HẾT NGỮ CẢNH ---`;
                 }
 
                 // Build messages array
@@ -229,6 +244,8 @@ RinoEdu sử dụng kiến trúc "Modular Monolith":
                                     toolResult = await searchConfluence(args.query, env);
                                 } else if (fnName === "confluence_count_spaces") {
                                     toolResult = await countConfluenceSpaces(env);
+                                } else if (fnName === "read_whitepaper") {
+                                    toolResult = WHITEPAPER_CONTENT;
                                 } else {
                                     toolResult = JSON.stringify({ error: "Unknown tool: " + fnName });
                                 }
@@ -271,41 +288,39 @@ RinoEdu sử dụng kiến trúc "Modular Monolith":
             }
         }
 
-        // ── REVERSE PROXY: Forward all other requests to the Cloudflare Tunnel ──
-        try {
-            const proxyUrl = new URL(url.pathname + url.search, TUNNEL_ORIGIN);
-            const proxyRequest = new Request(proxyUrl.toString(), {
-                method: request.method,
-                headers: request.headers,
-                body: request.method !== "GET" && request.method !== "HEAD" ? request.body : undefined,
-                redirect: "follow",
-            });
+        // ── FALLBACK ROUTE: Simple API Landing Page ──
+        const landingHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>RinoEdu AI API</title>
+            <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f8fafc; color: #334155; }
+                .card { background: white; padding: 2.5rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); text-align: center; max-width: 400px; }
+                .success { color: #10b981; font-weight: bold; margin-bottom: 1rem; }
+                h1 { margin: 0 0 0.5rem 0; color: #0f172a; font-size: 1.5rem; }
+                p { margin: 0; font-size: 0.95rem; line-height: 1.5; }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <div class="success">● Systems Operational</div>
+                <h1>RinoEdu AI API Server</h1>
+                <p>Welcome! This is the backend API server for RinoEdu. The AI Chat endpoints are functioning normally.</p>
+                <div style="margin-top: 1.5rem; font-size: 0.8rem; color: #94a3b8;">
+                    Endpoint: /mcp/v1/chat<br>
+                    Model: GPT-4o-mini
+                </div>
+            </div>
+        </body>
+        </html>`;
 
-            const proxyResponse = await fetch(proxyRequest);
-
-            // Clone response and add CORS headers
-            const responseHeaders = new Headers(proxyResponse.headers);
-            responseHeaders.set("Access-Control-Allow-Origin", "*");
-
-            return new Response(proxyResponse.body, {
-                status: proxyResponse.status,
-                statusText: proxyResponse.statusText,
-                headers: responseHeaders,
-            });
-        } catch (e) {
-            return new Response(
-                `<!DOCTYPE html><html><head><title>RinoEdu</title></head><body style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#f1f5f9">
-                <div style="text-align:center">
-                    <h1 style="color:#1e40af">🚀 RinoEdu AI Platform</h1>
-                    <p style="color:#64748b">Server đang khởi động, vui lòng thử lại sau vài giây...</p>
-                    <p style="color:#94a3b8;font-size:12px">Error: ${e.message}</p>
-                    <button onclick="location.reload()" style="margin-top:16px;padding:8px 24px;background:#2563eb;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold">Tải lại</button>
-                </div></body></html>`,
-                {
-                    status: 502,
-                    headers: { "Content-Type": "text/html; charset=utf-8" },
-                }
-            );
-        }
+        return new Response(landingHTML, {
+            status: 200,
+            headers: {
+                "Content-Type": "text/html; charset=utf-8",
+                "Access-Control-Allow-Origin": "*",
+            },
+        });
     },
 };

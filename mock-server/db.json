@@ -169,5 +169,19 @@
         "activeClasses": 24,
         "monthlyRevenue": 450000000,
         "attendanceRate": 92.5
-    }
+    },
+    "comms_messages": [
+        {}
+    ],
+    "comms_errorLogs": [
+        {}
+    ],
+    "comms_error_logs": [
+        {},
+        {}
+    ]
+}    {},
+        {},
+        {}
+    ]
 }

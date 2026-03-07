@@ -1,4 +1,4 @@
-# Sách Trắng Kiến trúc RinoEdu (Architecture Whitepaper)
+export const WHITEPAPER_CONTENT = `# Sách Trắng Kiến trúc RinoEdu (Architecture Whitepaper)
 *Bản Cập nhật Chính thức v2.0 — Dành cho Đội Phát triển, AI Factory & Trợ lý AI*
 
 ---
@@ -12,51 +12,51 @@ Mã nguồn ứng dụng được chia thành các Khối độc lập (Modules)
 ### 2.1 Các Module Cốt lõi (Core Modules)
 | # | Module | Thư mục | Trạng thái | Mô tả |
 |:--|:-------|:--------|:----------:|:------|
-| 1 | **iam** | `src/modules/iam/` | ✅ 6 files | Quản lý định danh, phân quyền, hồ sơ cá nhân, bảo mật, OrgSettings |
-| 2 | **education** | `src/modules/education/` | 🟡 1 file | Quản lý lớp học, điểm danh, điểm số |
-| 3 | **hr** | `src/modules/hr/` | 🟡 1 file | Quản lý nhân viên, chấm công, tính lương |
-| 4 | **mdm** | `src/modules/mdm/` | 🟡 1 file | Kho tài sản, Cơ sở vật chất |
-| 5 | **crm** | `src/modules/crm/` | ❌ Empty | Phễu bán hàng, Leads |
-| 6 | **fintech** | `src/modules/fintech/` | ❌ Empty | Học phí, Thu chi, VNPAY |
-| 7 | **comms** | `src/modules/comms/` | ❌ Empty | Chat, Email, SMS |
-| 8 | **logistics** | `src/modules/logistics/` | ❌ Empty | Vận chuyển tài liệu |
+| 1 | **iam** | \`src/modules/iam/\` | ✅ 6 files | Quản lý định danh, phân quyền, hồ sơ cá nhân, bảo mật, OrgSettings |
+| 2 | **education** | \`src/modules/education/\` | 🟡 1 file | Quản lý lớp học, điểm danh, điểm số |
+| 3 | **hr** | \`src/modules/hr/\` | 🟡 1 file | Quản lý nhân viên, chấm công, tính lương |
+| 4 | **mdm** | \`src/modules/mdm/\` | 🟡 1 file | Kho tài sản, Cơ sở vật chất |
+| 5 | **crm** | \`src/modules/crm/\` | ❌ Empty | Phễu bán hàng, Leads |
+| 6 | **fintech** | \`src/modules/fintech/\` | ❌ Empty | Học phí, Thu chi, VNPAY |
+| 7 | **comms** | \`src/modules/comms/\` | ❌ Empty | Chat, Email, SMS |
+| 8 | **logistics** | \`src/modules/logistics/\` | ❌ Empty | Vận chuyển tài liệu |
 
 ### 2.2 Ba (3) Luật Sống còn của Backend & Database
-1. **Cấm truy vấn chéo (No Cross-DB Queries):** Bảng mỗi module mang tiền tố riêng (`iam_users`, `crm_leads`).
+1. **Cấm truy vấn chéo (No Cross-DB Queries):** Bảng mỗi module mang tiền tố riêng (\`iam_users\`, \`crm_leads\`).
 2. **Giao tiếp qua DTOs:** Module gọi nhau qua HTTP/RPC API nội bộ, không truy vấn trực tiếp DB.
-3. **API Contract:** FE phải sử dụng Interface/DTO chuẩn đặt tại `src/shared/interfaces/`.
+3. **API Contract:** FE phải sử dụng Interface/DTO chuẩn đặt tại \`src/shared/interfaces/\`.
 
 ## 3. HẠ TẦNG FRONTEND & TÍNH NĂNG LÕI (CORE FOUNDATION)
 
 ### 3.1 Các Trụ cột Kỹ thuật
 | Trụ cột | File | Mô tả |
 |:--------|:-----|:------|
-| **i18n** | `src/utils/i18n.js` | Đa ngôn ngữ Vi/En, chuyển đổi real-time qua `window.setLanguage()` |
-| **Formatters** | `src/utils/formatters.js` | Format tiền (VND/USD), ngày (DD/MM/YYYY). Cấm hardcode |
-| **Design Tokens** | `src/shared/design-tokens.css` | Biến CSS: `--color-brand`, `--color-success`. Cấm dùng mã HEX cứng |
-| **Icons** | `src/utils/icons.jsx` | 135+ icon Lucide, truy cập qua `window.Icons.TênIcon` |
-| **Mock Data** | `src/utils/data.jsx` | Dữ liệu mẫu toàn hệ thống, 50+ apps, 5 lớp, 3 GV, 4 chi nhánh |
-| **Error Interceptor** | `src/api/client.js` | Tự bơm JWT, xử lý 401/403/500 |
+| **i18n** | \`src/utils/i18n.js\` | Đa ngôn ngữ Vi/En, chuyển đổi real-time qua \`window.setLanguage()\` |
+| **Formatters** | \`src/utils/formatters.js\` | Format tiền (VND/USD), ngày (DD/MM/YYYY). Cấm hardcode |
+| **Design Tokens** | \`src/shared/design-tokens.css\` | Biến CSS: \`--color-brand\`, \`--color-success\`. Cấm dùng mã HEX cứng |
+| **Icons** | \`src/utils/icons.jsx\` | 135+ icon Lucide, truy cập qua \`window.Icons.TênIcon\` |
+| **Mock Data** | \`src/utils/data.jsx\` | Dữ liệu mẫu toàn hệ thống, 50+ apps, 5 lớp, 3 GV, 4 chi nhánh |
+| **Error Interceptor** | \`src/api/client.js\` | Tự bơm JWT, xử lý 401/403/500 |
 
 ### 3.2 Các Component Dùng chung
 | Component | File | Chức năng chính |
 |:----------|:-----|:----------------|
-| **Header** | `src/components/Header.jsx` | Breadcrumb, Search trigger, Notifications, Avatar |
-| **Sidebar** | `src/components/Sidebar.jsx` | Navigation chính, collapse/expand, icon-only mode |
-| **SubSidebar** | `src/components/SubSidebar.jsx` | Menu phụ theo module đang active |
-| **AppLauncher** | `src/components/AppLauncher.jsx` | Grid apps, Drag & Drop reorder, Category filter |
-| **GlobalSearch** | `src/components/GlobalSearch.jsx` | Ctrl+K, real-time filter, AI mode toggle |
-| **UserMenu** | `src/components/UserMenu.jsx` | Workspace switcher, Dark mode, Logout |
-| **NotificationBell** | `src/components/common/NotificationBell.jsx` | SSE mock, badge count, mark-all-read |
-| **DevAISidebar** | `src/components/DevAISidebar.jsx` | Chat AI panel, Markdown render, Code highlight |
+| **Header** | \`src/components/Header.jsx\` | Breadcrumb, Search trigger, Notifications, Avatar |
+| **Sidebar** | \`src/components/Sidebar.jsx\` | Navigation chính, collapse/expand, icon-only mode |
+| **SubSidebar** | \`src/components/SubSidebar.jsx\` | Menu phụ theo module đang active |
+| **AppLauncher** | \`src/components/AppLauncher.jsx\` | Grid apps, Drag & Drop reorder, Category filter |
+| **GlobalSearch** | \`src/components/GlobalSearch.jsx\` | Ctrl+K, real-time filter, AI mode toggle |
+| **UserMenu** | \`src/components/UserMenu.jsx\` | Workspace switcher, Dark mode, Logout |
+| **NotificationBell** | \`src/components/common/NotificationBell.jsx\` | SSE mock, badge count, mark-all-read |
+| **DevAISidebar** | \`src/components/DevAISidebar.jsx\` | Chat AI panel, Markdown render, Code highlight |
 
 ### 3.3 Giao diện Trang Chủ (SquareHomepage)
-Component chính: `src/pages/SquareHomepage.jsx` (URL: `#/home`)
+Component chính: \`src/pages/SquareHomepage.jsx\` (URL: \`#/home\`)
 Trang chủ RinoEdu được thiết kế theo phong cách tối giản, tập trung vào tìm kiếm và AI:
 - **Header:** Chứa Logo, nút App Launcher (dạng lưới), nút "Dashboard", và Avatar người dùng (hoặc nút Đăng nhập).
 - **Banner Trung tâm:** Logo tia chớp với dòng chữ lớn "RinoEdu - Nền tảng quản lý giáo dục thông minh".
 - **Thanh Tìm kiếm Toàn năng (Universal Search):** Nằm ngay giữa màn hình ("Tìm kiếm toàn bộ hệ thống..."), đi kèm với nút "Hỏi AI" (biểu tượng Sparkles). Khi user nhập liệu hoặc nhấn Hỏi AI, giao diện sẽ mở rộng để tương tác với RinoEdu AI.
-- **Truy cập nhanh (Quick Access):** Danh sách các module phổ biến nằm ngay dưới thanh tìm kiếm, bao gồm: `Đào tạo`, `Nhân sự`, `CRM`, `Kho tài sản`, `Quản lý tài khoản`.
+- **Truy cập nhanh (Quick Access):** Danh sách các module phổ biến nằm ngay dưới thanh tìm kiếm, bao gồm: \`Đào tạo\`, \`Nhân sự\`, \`CRM\`, \`Kho tài sản\`, \`Quản lý tài khoản\`.
 - **Kho AI & Tài nguyên (Warehouse):** Quản lý tài liệu và các file được dùng cho Agent AI.
 - **Code Canvas:** Vùng hiển thị code/preview khi đang ở chế độ Coding Mode với AI.
 
@@ -67,7 +67,7 @@ Trang chủ RinoEdu được thiết kế theo phong cách tối giản, tập t
 ### 4.1 Hệ thống Điều hướng Thông minh (Smart Navigation)
 
 **Universal Search (Cmd/Ctrl + K):**
-- Mở bằng phím tắt `Ctrl+K` hoặc click vào thanh search trên Header
+- Mở bằng phím tắt \`Ctrl+K\` hoặc click vào thanh search trên Header
 - Tìm kiếm real-time: gõ tên app → kết quả lọc tức thì
 - Dùng phím ↑↓ để di chuyển giữa kết quả, Enter để chọn, ESC để đóng
 - Tab "AI mode" (biểu tượng Sparkles ✨) → chuyển sang hỏi AI trợ lý
@@ -80,8 +80,8 @@ Trang chủ RinoEdu được thiết kế theo phong cách tối giản, tập t
 - Mỗi app card hiển thị: Tên, Mô tả, Giá, Nút "Mở"
 
 **Shortcuts Guide:**
-- Nhấn phím `?` bất cứ lúc nào → mở bảng phím tắt toàn hệ thống
-- Các phím tắt chính: `Ctrl+K` (Search), `?` (Guide), `Ctrl+B` (Sidebar toggle)
+- Nhấn phím \`?\` bất cứ lúc nào → mở bảng phím tắt toàn hệ thống
+- Các phím tắt chính: \`Ctrl+K\` (Search), \`?\` (Guide), \`Ctrl+B\` (Sidebar toggle)
 
 ### 4.2 Quản trị Tổ chức (Organization Management)
 Truy cập: **Quản lý tài khoản** → Sidebar trái → **Cài đặt nền tảng**
@@ -129,8 +129,8 @@ Truy cập: **Quản lý tài khoản** → nhóm "Quản trị Hệ thống"
 
 ## 5. API SCHEMA REFERENCE (MOCK DATA)
 
-### 5.1 Cấu trúc Ứng dụng (`ALL_APP_LIBRARY`)
-```javascript
+### 5.1 Cấu trúc Ứng dụng (\`ALL_APP_LIBRARY\`)
+\`\`\`javascript
 {
   id: 'app_id',         // Unique key
   name: 'Tên hiển thị', // Vietnamese app name
@@ -140,10 +140,10 @@ Truy cập: **Quản lý tài khoản** → nhóm "Quản trị Hệ thống"
   desc: 'Mô tả',       // Short description
   price: 'Free|Pro'     // Pricing tier
 }
-```
+\`\`\`
 
-### 5.2 Cấu trúc Chi nhánh (`BRANCH_LIST_DETAILED`)
-```javascript
+### 5.2 Cấu trúc Chi nhánh (\`BRANCH_LIST_DETAILED\`)
+\`\`\`javascript
 {
   id: 'b1',
   name: 'Trụ sở Cầu Giấy',
@@ -157,10 +157,10 @@ Truy cập: **Quản lý tài khoản** → nhóm "Quản trị Hệ thống"
   rooms: 12,                 // Số phòng học
   operatingHours: '08:00 - 21:00'
 }
-```
+\`\`\`
 
-### 5.3 Cấu trúc Thông báo (`NOTIFICATIONS_MOCK`)
-```javascript
+### 5.3 Cấu trúc Thông báo (\`NOTIFICATIONS_MOCK\`)
+\`\`\`javascript
 {
   id: 1,
   type: 'approval|meeting|system|chat',
@@ -173,10 +173,10 @@ Truy cập: **Quản lý tài khoản** → nhóm "Quản trị Hệ thống"
   actionable: true,          // Có nút Approve/Reject
   status: 'pending|approved'
 }
-```
+\`\`\`
 
-### 5.4 Cấu trúc Lớp học (`MOCK_CLASSES`)
-```javascript
+### 5.4 Cấu trúc Lớp học (\`MOCK_CLASSES\`)
+\`\`\`javascript
 {
   id: 'c1',
   name: 'Toán Cao Cấp - K12',
@@ -189,24 +189,24 @@ Truy cập: **Quản lý tài khoản** → nhóm "Quản trị Hệ thống"
   room: 'Phòng 301',
   color: 'blue'              // Theme color
 }
-```
+\`\`\`
 
-### 5.5 Cấu trúc Tài khoản Tab (`ACCOUNT_TABS`)
-```javascript
+### 5.5 Cấu trúc Tài khoản Tab (\`ACCOUNT_TABS\`)
+\`\`\`javascript
 {
   id: 'profile',
   label: 'Hồ sơ cá nhân',
   iconName: 'IdCard',       // String → window.Icons[iconName]
   category: 'Tài khoản|Quản lý Nền tảng|Quản trị Hệ thống'
 }
-```
+\`\`\`
 
 ---
 
 ## 6. USER FLOW DIAGRAMS
 
 ### 6.1 Luồng Đăng nhập & Điều hướng
-```mermaid
+\`\`\`mermaid
 flowchart TD
     A["Truy cập RinoEdu"] --> B{Đã đăng nhập?}
     B -- Chưa --> C["Trang SquareHomepage"]
@@ -219,10 +219,10 @@ flowchart TD
     H --> I["Chọn Module"]
     I --> J["SubSidebar theo Module"]
     J --> K["Render nội dung Module"]
-```
+\`\`\`
 
 ### 6.2 Luồng Quản lý Tổ chức
-```mermaid
+\`\`\`mermaid
 flowchart TD
     A["Quản lý Tài khoản"] --> B["SubSidebar: Cài đặt nền tảng"]
     B --> C["OrgSettings Component"]
@@ -233,10 +233,10 @@ flowchart TD
     D --> H["Nhật ký: Xem activity feed"]
     E --> I["Nhấn Lưu → window.Data cập nhật"]
     G --> J["Auto-save → dispatch Event"]
-```
+\`\`\`
 
 ### 6.3 Luồng Tìm kiếm & AI
-```mermaid
+\`\`\`mermaid
 flowchart TD
     A["Nhấn Ctrl+K"] --> B["GlobalSearch mở"]
     B --> C{User gõ keyword}
@@ -248,14 +248,14 @@ flowchart TD
     H --> I["RinoAI.sendMessage()"]
     I --> J["KB keyword matching"]
     J --> K["Stream response từng từ"]
-```
+\`\`\`
 
 ---
 
 ## 7. CHIẾN LƯỢC RINOEDU AI (AI FACTORY v2.0)
 
 ### 7.1 Kiến trúc AI Hiện tại
-```
+\`\`\`
 ┌─────────────────────────────────────────────┐
 │  Frontend (DevAISidebar.jsx)                │
 │  ├── Input → RinoAI.sendMessage()           │
@@ -271,38 +271,39 @@ flowchart TD
 │  Cloudflare Workers (rino)                 │
 │  └── LLM endpoint cho production            │
 └─────────────────────────────────────────────┘
-```
+\`\`\`
 
 ### 7.2 Knowledge Base Categories
 AI hiện biết trả lời về: Giới thiệu bản thân, Học viên, Lớp học, Giáo viên, Học phí, Báo cáo, Điểm danh, Cài đặt, Tìm kiếm, Workspace, Đăng nhập, Kho tài sản, Coding mode.
 
 ### 7.3 Tool Calling (Quick Actions)
 AI có thể thực hiện các hành động thực trên nền tảng:
-- `navigate(moduleId)` — Mở module/app bất kỳ
-- `toggleTheme()` — Chuyển đổi Dark/Light mode
-- `getData(key)` — Trả về dữ liệu thực từ `window.Data`
-- `openBranch(branchId)` — Mở chi tiết chi nhánh trong OrgSettings
+- \`navigate(moduleId)\` — Mở module/app bất kỳ
+- \`toggleTheme()\` — Chuyển đổi Dark/Light mode
+- \`getData(key)\` — Trả về dữ liệu thực từ \`window.Data\`
+- \`openBranch(branchId)\` — Mở chi tiết chi nhánh trong OrgSettings
 
 ### 7.4 AI Factory (Dành cho Developer)
 RinoEdu AI Factory gồm 7 Agents chạy CrewAI Python:
-- **`pm`**: Product Manager — phân tích yêu cầu, lập kế hoạch sprint
-- **`ui`**: UI Designer — thiết kế giao diện, chọn color palette
-- **`be`**: Backend Engineer — viết API, database schema
-- **`fe`**: Frontend Engineer — viết React component, CSS
-- **`review`**: Code Reviewer — kiểm tra chất lượng code
-- **`test`**: QA Tester — viết test case, kiểm thử
-- **`doc`**: Technical Writer — viết documentation, user guide
+- **\`pm\`**: Product Manager — phân tích yêu cầu, lập kế hoạch sprint
+- **\`ui\`**: UI Designer — thiết kế giao diện, chọn color palette
+- **\`be\`**: Backend Engineer — viết API, database schema
+- **\`fe\`**: Frontend Engineer — viết React component, CSS
+- **\`review\`**: Code Reviewer — kiểm tra chất lượng code
+- **\`test\`**: QA Tester — viết test case, kiểm thử
+- **\`doc\`**: Technical Writer — viết documentation, user guide
 
 Các Agents đọc Whitepaper này và tự động sinh code React/Mock Server chính xác cho Human Developer duyệt.
 
 ---
 
 ## 8. LƯU Ý CHO DEVELOPER & AI AGENTS
-- **Mock Data:** Toàn bộ nằm tại `src/utils/data.jsx`. IIFE wrapping để tránh global pollution.
-- **Icon:** Dùng `window.Icons.TênIcon`. TUYỆT ĐỐI không tạo biến `Map` ở global scope (trùng `window.Map`).
-- **Reactivity:** Khi thay đổi `OrgSettings`, dispatch `org-data-updated` event.
-- **Routing:** Hash-based (`#/module_id`). Không dùng HTML5 History API với Live Server.
-- **i18n:** File `.js` (không phải `.jsx`). Truy cập qua `window.i18n.t('key')`.
+- **Mock Data:** Toàn bộ nằm tại \`src/utils/data.jsx\`. IIFE wrapping để tránh global pollution.
+- **Icon:** Dùng \`window.Icons.TênIcon\`. TUYỆT ĐỐI không tạo biến \`Map\` ở global scope (trùng \`window.Map\`).
+- **Reactivity:** Khi thay đổi \`OrgSettings\`, dispatch \`org-data-updated\` event.
+- **Routing:** Hash-based (\`#/module_id\`). Không dùng HTML5 History API với Live Server.
+- **i18n:** File \`.js\` (không phải \`.jsx\`). Truy cập qua \`window.i18n.t('key')\`.
 
 ---
 *RinoEdu - Modern Education OS — Whitepaper v2.0*
+`;
