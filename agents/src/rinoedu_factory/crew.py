@@ -21,7 +21,7 @@ def get_llm():
     gemini_key = os.getenv("GEMINI_API_KEY")
 
     if openai_key:
-        model = os.getenv("LLM_MODEL", "gpt-4o-mini")
+        model = os.getenv("LLM_MODEL", "gpt-5.4")
         return LLM(model=model, api_key=openai_key, temperature=0.3)
     elif gemini_key:
         model = os.getenv("LLM_MODEL", "gemini/gemini-2.0-flash")
