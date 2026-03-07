@@ -1,0 +1,28 @@
+PROJECT BRIEF: TICKET MANAGEMENT MODULE & BUG FIXES
+
+GIỚI THIỆU:
+Chúng ta cần xây dựng tính năng Quản lý Ticket (quy mô nhỏ gọn) và xử lý 2 ticket lỗi UI đã được ghi nhận. Hệ thống có 2 đối tượng gửi ticket chính: Người dùng cuối (End User) và Đội phát triển (Dev Team).
+
+YÊU CẦU CHO TEAM AI (UI, FE, BE, QA):
+
+1. THIẾT KẾ & PHÁT TRIỂN COMPONENT CREATETICKETMODAL:
+- Tạo mới file: `src/components/common/CreateTicketModal.jsx`
+- Form gồm các trường:
+  + Tiêu đề (Input text)
+  + Vai trò người gửi (Select/Dropdown): "Người dùng cuối (End User)", "Đội phát triển (Dev Team)", "Quản trị viên (Admin)"
+  + Loại Ticket (Select/Dropdown): "Lỗi (Bug)", "Tính năng mới (Feature)", "Câu hỏi (Question)"
+  + Mô tả chi tiết (Textarea)
+- Giao diện: Sử dụng TailwindCSS dạng Modal popup (nền tối mờ, box trắng/dark mode ở giữa). Có nút Hủy và Gửi.
+- Tích hợp API: Khi submit, POST dữ liệu dạng JSON vào `http://localhost:3001/tickets` kèm thêm trường `status: "Open"`, `source: "Manual"`, `createdAt: [thời gian hiện tại]`.
+- States: Xử lý đầy đủ Loading (khi đang gửi), Success (khi thành công, tự đóng modal sau 2s), Error (hiện thông báo lỗi màu đỏ).
+
+2. XỬ LÝ 2 TICKET BUG THEO YÊU CẦU:
+- Cập nhật file: `src/pages/Dashboard.jsx`
+- Ticket TICK-1001: Nút bấm 'Thêm mới' (nút có dấu Plus) trong phần Truy cập nhanh (Quick Access) đang bị lệch. Hãy sửa CSS/Tailwind (padding/margin/flex) để nó thẳng hàng hoàn hảo với các nút bên cạnh.
+- Ticket TICK-1002: Đổi màu nút 'Xem tất cả' trong phần Hoạt động cá nhân (Activity Feed). Sửa class text từ màu xám/neutral thành màu xanh lá cây (`text-emerald-500` hoặc tương tự) và thêm hiệu ứng hover đổi màu nổi bật hơn.
+
+QUY TẮC CỐT LÕI:
+- Frontend Engineer phải đọc kỹ thiết kế của UI Designer và Contract của BE.
+- Phải fetch và post đúng cấu trúc.
+- QA Automation Engineer phải viết test case Gherkin cho Form tạo Ticket (bao gồm luồng validate dữ liệu trống).
+- Giữ vững kiến trúc Modular Monolith. Đừng xóa code cũ nếu không cần thiết.

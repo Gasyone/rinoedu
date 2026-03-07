@@ -99,6 +99,22 @@ const openaiTools = [
                 required: []
             }
         }
+    },
+    {
+        type: "function",
+        function: {
+            name: "create_ticket",
+            description: "Tạo một Support Ticket (yêu cầu hỗ trợ/báo lỗi/tính năng mới) trên hệ thống RinoEdu dựa trên yêu cầu người dùng.",
+            parameters: {
+                type: "object",
+                properties: {
+                    title: { type: "string", description: "Tiêu đề ngắn gọn của ticket" },
+                    description: { type: "string", description: "Mô tả chi tiết nội dung cần hỗ trợ" },
+                    type: { type: "string", enum: ["Bug", "Feature", "Question"], description: "Phân loại ticket" }
+                },
+                required: ["title", "description", "type"]
+            }
+        }
     }
 ];
 
@@ -245,6 +261,14 @@ QUY TẮC QUAN TRỌNG:
                                     toolResult = await countConfluenceSpaces(env);
                                 } else if (fnName === "read_whitepaper") {
                                     toolResult = WHITEPAPER_CONTENT;
+                                } else if (fnName === "create_ticket") {
+                                    // Mocking ticket creation for the AI response
+                                    toolResult = JSON.stringify({
+                                        status: "success",
+                                        message: "Ticket created successfully.",
+                                        ticket_id: "TICK-" + Math.floor(Math.random() * 9000 + 1000),
+                                        details: args
+                                    });
                                 } else {
                                     toolResult = JSON.stringify({ error: "Unknown tool: " + fnName });
                                 }

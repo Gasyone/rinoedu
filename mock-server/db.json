@@ -179,9 +179,28 @@
     "comms_error_logs": [
         {},
         {}
-    ]
-}    {},
-        {},
+    ],
+    "tickets": [
+        {
+            "id": "TICK-1001",
+            "title": "Nút bấm 'Thêm mới' trên Dashboard bị lệch",
+            "description": "Trên màn hình Dashboard, nút Thêm mới trong phần Truy cập nhanh bị lệch sang trái 5px so với các icon khác.",
+            "type": "Bug",
+            "status": "Open",
+            "source": "Manual",
+            "createdAt": "2026-03-07T09:00:00Z"
+        },
+        {
+            "id": "TICK-1002",
+            "title": "Đổi màu nút Xem tất cả",
+            "description": "Nhờ Rino tạo giúp tôi 1 ticket yêu cầu đổi màu nút 'Xem tất cả' trong Activity Feed sang màu xanh lá cây để nổi bật hơn.",
+            "type": "Feature",
+            "status": "Open",
+            "source": "AI",
+            "createdAt": "2026-03-07T09:15:00Z"
+        }
+    ],
+    "comms_tickets": [
         {}
     ]
 }

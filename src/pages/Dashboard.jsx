@@ -9,6 +9,7 @@ window.Components.Dashboard = ({
     shortcuts, handleOpenApp
 }) => {
     const [now, setNow] = useDashState(new Date());
+    const [isTicketModalOpen, setTicketModalOpen] = useDashState(false);
 
     useDashEffect(() => {
         const timer = setInterval(() => setNow(new Date()), 1000);
@@ -64,7 +65,7 @@ window.Components.Dashboard = ({
                             <span className="text-xs md:text-sm font-semibold text-slate-700 dark:text-slate-300 text-center">{sc.name}</span>
                         </div>
                     ))}
-                    <div className="flex flex-col items-center gap-3 p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 transition cursor-pointer text-slate-400 hover:text-blue-500">
+                    <div onClick={() => setTicketModalOpen(true)} className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 transition cursor-pointer text-slate-400 hover:text-blue-500 text-center">
                         <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center bg-slate-50 dark:bg-slate-700"><Plus className="w-5 h-5 md:w-6 md:h-6" /></div>
                         <span className="text-xs md:text-sm font-medium">Thêm mới</span>
                     </div>
@@ -135,9 +136,16 @@ window.Components.Dashboard = ({
                             </div>
                         ))}
                     </div>
-                    <button className="mt-4 w-full py-2 text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition">Xem tất cả</button>
+                    <button className="mt-4 w-full py-2 text-xs font-bold text-emerald-500 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-xl transition shadow-sm">Xem tất cả</button>
                 </div>
             </div>
+
+            {window.Components.CreateTicketModal && (
+                <window.Components.CreateTicketModal
+                    isOpen={isTicketModalOpen}
+                    onClose={() => setTicketModalOpen(false)}
+                />
+            )}
         </div >
     );
 };
