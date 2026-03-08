@@ -270,6 +270,8 @@ window.Components.SquareHomepage = ({
         Send, Sparkles, User, Server, Globe, Image, Code, ArrowUpRight,
         LayoutGrid, X, Bot, MessageSquare, Check, Copy
     } = window.Icons || {};
+    const runtimeConfig = window.RinoRuntimeConfig || {};
+    const aiChatEndpoint = `${runtimeConfig.AI_CHAT_BASE || 'https://apirinoai.gasy.io'}/mcp/v1/chat`;
 
     const [activeMode, setActiveMode] = useState('search'); // 'search' | 'ai'
     const [searchTab, setSearchTab] = useState('all');
@@ -408,7 +410,7 @@ window.Components.SquareHomepage = ({
                 context: screenContext
             };
 
-            const response = await fetch('https://rino.gasy.io/mcp/v1/chat', {
+            const response = await fetch(aiChatEndpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

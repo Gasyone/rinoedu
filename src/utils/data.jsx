@@ -24,6 +24,7 @@
             calendar: { id: 'calendar', name: 'Lịch biểu', icon: Calendar, color: 'text-green-600', category: 'Văn phòng', desc: 'Lịch họp, sự kiện.', price: 'Free' },
             drive: { id: 'drive', name: 'Drive', icon: Cloud, color: 'text-yellow-500', category: 'Văn phòng', desc: 'Lưu trữ tài liệu.', price: '199.000đ' },
             docs: { id: 'docs', name: 'Tài liệu', icon: FileText, color: 'text-blue-400', category: 'Văn phòng', desc: 'Soạn thảo văn bản.', price: 'Free' },
+            knowledge_hub: { id: 'knowledge_hub', name: 'Tri thức', icon: BookOpen, color: 'text-indigo-600', category: 'Văn hóa', desc: 'Trung tâm tài liệu & AI Hub.', price: 'Free' },
             meeting: { id: 'meeting', name: 'Họp', icon: Video, color: 'text-purple-600', category: 'Văn phòng', desc: 'Video conference.', price: 'Free' },
             tasks: { id: 'tasks', name: 'Công việc', icon: CheckCircle, color: 'text-emerald-500', category: 'Văn phòng', desc: 'To-do list cá nhân.', price: 'Free' },
             library: { id: 'library', name: 'Thư viện', icon: BookOpen, color: 'text-amber-600', category: 'Văn hóa', desc: 'Sách & Tài liệu.', price: 'Free' },
@@ -66,6 +67,89 @@
             app_extra_2: { id: 'app_extra_2', name: 'Tiện ích 2', icon: Shield, color: 'text-pink-500', category: 'Khác', desc: 'Mở rộng 2', price: 'Free' },
             square: { id: 'square', name: 'Trang chủ', icon: Home, color: 'text-blue-500', category: 'Hệ thống', desc: 'Trở về màn hình chính của mạng lưới Rinoapp.', price: 'Free' },
         },
+
+        MOCK_WHITEPAPERS: [
+            {
+                id: 'wp_001',
+                title: 'Tài liệu Kiến trúc mẫu (Whitepaper) - Backend Team',
+                category: 'Architecture',
+                summary: 'Hướng dẫn chi tiết về cấu trúc thư mục, quy tắc module và chuẩn giao tiếp API cho RinoEdu.',
+                tags: ['Backend', 'Architecture', 'Standard'],
+                icon: '🏗️',
+                readTime: '10',
+                audience: 'Developer',
+                version: '1.2.0',
+                views: 1250,
+                rating: 4.8,
+                status: 'published',
+                isFavorite: true,
+                author: 'Admin Rino',
+                date: '2024-03-01',
+                attachments: [
+                    { id: 'att_1', name: 'Backend_Standard_v1.pdf', size: '1.2MB' },
+                    { id: 'att_2', name: 'API_Contracts_Excel.xlsx', size: '450KB' }
+                ],
+                variants: [
+                    { id: 'v1', name: 'Bản Tiếng Việt (Gốc)', active: true },
+                    { id: 'v2', name: 'English Version', active: false }
+                ],
+                history: [
+                    { date: '2024-03-01', user: 'Admin Rino', action: 'Phát hành bản 1.2.0' },
+                    { date: '2024-02-15', user: 'Tech Lead', action: 'Cập nhật quy tắc Module' }
+                ],
+                comments: [
+                    { id: 'c1', user: 'Jacky', avatar: 'https://i.pravatar.cc/150?u=jacky', text: 'Tài liệu rất chi tiết, team đã áp dụng cho module mới!', date: '2 ngày trước' },
+                    { id: 'c2', user: 'Minh', avatar: 'https://i.pravatar.cc/150?u=minh', text: 'Cần bổ sung thêm phần sơ đồ logic.', date: '5 giờ trước' }
+                ],
+                content: `
+# TÀI LIÊU KIẾN TRÚC MẪU (WHITE DOC) DÀNH CHO TEAM BACKEND
+
+## 1. Mục đích
+- **Frontend:** React SPA (chia module chặt chẽ theo chuẩn Modular Monolith).
+- **Backend:** Sử dụng Mock Server (\`json-server\`) trả về dữ liệu mẫu trong giai đoạn Demo.
+
+## 2. Luật sống còn
+- CẤM truy vấn chéo (Cross-module query) giữa các bảng CSDL của các module khác nhau.
+- Giao tiếp giữa UI và Backend phải qua DTOs rõ ràng.
+- Mọi API Contract phải khai báo trong thư mục \`/src/shared/interfaces/\`.
+
+## 3. Cấu trúc thư mục chuẩn
+- \`/iam\` (Quản lý định danh, User, Role)
+- \`/hr\` (Quản trị nhân sự)
+- \`/education\` (Khóa học, Lớp học)
+                `
+            },
+            {
+                id: 'wp_002',
+                title: 'Hướng dẫn chuẩn Coding Convention Frontend',
+                category: 'Development',
+                summary: 'Quy định về đặt tên, cấu trúc component và các failsafe phòng chống crash cho React app.',
+                tags: ['Frontend', 'Convention', 'React'],
+                icon: '💻',
+                readTime: '15',
+                audience: 'Frontend Engineer',
+                version: '2.0.1',
+                views: 840,
+                rating: 4.5,
+                status: 'published',
+                isFavorite: false,
+                author: 'Phòng IT',
+                date: '2024-03-05',
+                attachments: [{ id: 'att_3', name: 'StyleGuide_Tailwind.pdf', size: '2.5MB' }],
+                variants: [{ id: 'v1', name: 'React 18 Standard', active: true }],
+                history: [{ date: '2024-03-05', user: 'Phòng IT', action: 'Khởi tạo tài liệu' }],
+                comments: [],
+                content: '# Hướng dẫn Coding Convention Frontend\n'
+            },
+            { id: 'wp_003', title: 'Quy trình vận hành Trung tâm Đào tạo', category: 'Process', summary: 'Quy trình 7 bước từ tiếp nhận đến tốt nghiệp.', icon: '🔄', readTime: '20', views: 520, rating: 4.7, status: 'published', author: 'Vận hành', content: '# Quy trình' },
+            { id: 'wp_004', title: 'Chính sách bảo mật dữ liệu người dùng', category: 'Security', summary: 'Chuẩn mã hóa và lưu trữ thông tin nhạy cảm.', icon: '🛡️', readTime: '12', views: 3200, rating: 4.9, status: 'published', author: 'Security Team', content: '# Bảo mật' },
+            { id: 'wp_005', title: 'Cấu trúc Database RinoEdu v3', category: 'Architecture', summary: 'Sơ đồ ERD và chuẩn hóa dữ liệu.', icon: '🏗️', readTime: '25', views: 450, rating: 4.6, status: 'published', author: 'Data Architect', content: '# Database' },
+            { id: 'wp_006', title: 'Hướng dẫn sử dụng AI Assistant', category: 'General', summary: 'Cách prompt hiệu quả cho trợ lý ảo.', icon: '🤖', readTime: '5', views: 12000, rating: 5.0, status: 'published', author: 'AI Team', content: '# AI Hub' },
+            { id: 'wp_007', title: 'Quy tắc thiết kế UI/UX Rino Design', category: 'Process', summary: 'Color palette, Typography và Component library.', icon: '🎨', readTime: '18', views: 670, rating: 4.8, status: 'published', author: 'Design Lead', content: '# UI/UX' },
+            { id: 'wp_008', title: 'Chiến lược phát triển Modular Monolith', category: 'Architecture', summary: 'Tại sao chọn Modular Monolith thay vì Microservices.', icon: '📦', readTime: '30', views: 240, rating: 4.4, status: 'published', author: 'CTO', content: '# Strategy' },
+            { id: 'wp_009', title: 'Checklist Deploy Hệ thống Rinoapp', category: 'Development', summary: 'Các bước kiểm tra trước khi lên Production.', icon: '🚀', readTime: '10', views: 890, rating: 4.7, status: 'published', author: 'DevOps', content: '# Deployment' },
+            { id: 'wp_010', title: 'Văn hóa và Giá trị cốt lõi RinoEdu', category: 'General', summary: 'Lịch sử hình thành và tầm nhìn 2030.', icon: '💎', readTime: '40', views: 5600, rating: 5.0, status: 'published', author: 'BOD', content: '# Culture' }
+        ],
 
         ACCOUNT_TABS: [
             // Tài khoản cá nhân

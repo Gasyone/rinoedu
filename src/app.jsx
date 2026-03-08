@@ -18,7 +18,6 @@ function App() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
     const [showAppLauncher, setShowAppLauncher] = useState(false);
     const [showGlobalSearch, setShowGlobalSearch] = useState(false);
-    const [isDevAIOpen, setIsDevAIOpen] = useState(false); // New state for AI Sidebar toggle
     const [isSwitchingModule, setIsSwitchingModule] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
@@ -335,8 +334,6 @@ function App() {
                         }}
                         showAppLauncher={showAppLauncher}
                         setShowAppLauncher={setShowAppLauncher}
-                        isDevAIOpen={isDevAIOpen}
-                        setIsDevAIOpen={setIsDevAIOpen}
                     />
                 ) : <div className="h-screen w-full flex items-center justify-center bg-slate-50 dark:bg-slate-900 text-slate-400">Đang khởi tạo RinoEdu...</div>}
 
@@ -372,8 +369,6 @@ function App() {
                             handleOpenApp(id);
                             setCurrentView('workspace');
                         }}
-                        isDevAIOpen={isDevAIOpen}
-                        setIsDevAIOpen={setIsDevAIOpen}
                     />
                 )}
                 {showAppLauncher && isAuthenticated && (
@@ -396,9 +391,6 @@ function App() {
                         isDarkMode={isDarkMode}
                     />
                 )}
-
-                {/* Dev AI Sidebar Overlay */}
-                {isAuthenticated && window.Components.DevAISidebar && <window.Components.DevAISidebar isDarkMode={isDarkMode} isDevAIOpen={isDevAIOpen} setIsDevAIOpen={setIsDevAIOpen} />}
             </div>
         );
     }
@@ -473,8 +465,6 @@ function App() {
                             markAsRead={markAsRead}
                             markAllAsRead={markAllAsRead}
                             notifications={notifications}
-                            isDevAIOpen={isDevAIOpen}
-                            setIsDevAIOpen={setIsDevAIOpen}
                         />
                     )}
 
@@ -571,6 +561,10 @@ function App() {
                                     <window.Components.ClassManager
                                         isDarkMode={isDarkMode}
                                     />
+                                ) : (activeModuleId === 'knowledge_hub' || activeModuleId === 'docs' || activeModuleId === 'library') && window.Modules.DocumentCenter ? (
+                                    <window.Modules.DocumentCenter
+                                        isDarkMode={isDarkMode}
+                                    />
                                 ) : (activeModuleId === 'assets' || activeModuleId === 'mdm' || activeModuleId === 'inventory' || activeModuleId === 'real_estate') && window.Components.WarehouseModule ? (
                                     <window.Components.WarehouseModule
                                         isDarkMode={isDarkMode}
@@ -634,70 +628,74 @@ function App() {
 
             {/* MODALS */}
 
-            {window.Components.ShortcutGuideModal && (
-                <window.Components.ShortcutGuideModal
-                    isOpen={showShortcutGuide}
-                    onClose={() => setShowShortcutGuide(false)}
-                    isDarkMode={isDarkMode}
-                />
-            )}
-
-            {showAppLauncher && window.Components.AppLauncher && (
-                <window.Components.AppLauncher
-                    myAppIds={myAppIds}
-                    setMyAppIds={setMyAppIds}
-                    pinnedAppIds={pinnedAppIds}
-                    isDarkMode={isDarkMode}
-                    handleOpenApp={handleOpenApp}
-                    togglePinApp={togglePinApp}
-                    installApp={installApp}
-                    uninstallApp={uninstallApp}
-                    onClose={() => setShowAppLauncher(false)}
-                />
-            )
+            {
+                window.Components.ShortcutGuideModal && (
+                    <window.Components.ShortcutGuideModal
+                        isOpen={showShortcutGuide}
+                        onClose={() => setShowShortcutGuide(false)}
+                        isDarkMode={isDarkMode}
+                    />
+                )
             }
 
-            {window.Components.GlobalSearch && (
-                <window.Components.GlobalSearch
-                    showGlobalSearch={showGlobalSearch}
-                    onClose={() => setShowGlobalSearch(false)}
-                    isDarkMode={isDarkMode}
-                    setIsDevAIOpen={setIsDevAIOpen}
-                />
-            )}
+            {
+                showAppLauncher && window.Components.AppLauncher && (
+                    <window.Components.AppLauncher
+                        myAppIds={myAppIds}
+                        setMyAppIds={setMyAppIds}
+                        pinnedAppIds={pinnedAppIds}
+                        isDarkMode={isDarkMode}
+                        handleOpenApp={handleOpenApp}
+                        togglePinApp={togglePinApp}
+                        installApp={installApp}
+                        uninstallApp={uninstallApp}
+                        onClose={() => setShowAppLauncher(false)}
+                    />
+                )
+            }
 
-            {window.Components.UserMenu && (
-                <window.Components.UserMenu
-                    showUserMenu={showUserMenu}
-                    setShowUserMenu={setShowUserMenu}
-                    isDarkMode={isDarkMode}
-                    setIsDarkMode={setIsDarkMode}
-                    isExpandedMode={isExpandedMode}
-                    setIsExpandedMode={setIsExpandedMode}
-                    notificationsEnabled={notificationsEnabled}
-                    setNotificationsEnabled={setNotificationsEnabled}
-                    workLocation={workLocation}
-                    setWorkLocation={setWorkLocation}
-                    workStatus={workStatus}
-                    setWorkStatus={setWorkStatus}
-                    showLocationModal={showLocationModal}
-                    setShowLocationModal={setShowLocationModal}
-                    showSettingsModal={showSettingsModal}
-                    setShowSettingsModal={setShowSettingsModal}
-                    onOpenApp={handleOpenApp}
-                    onLogout={() => {
-                        localStorage.removeItem('rino_auth_session');
-                        localStorage.removeItem('rino_auth_token');
-                        localStorage.removeItem('rino_user_profile');
-                        setIsAuthenticated(false);
-                        setCurrentUser(null);
-                        setCurrentView('square');
-                    }}
-                    currentUser={currentUser}
-                    isDevAIOpen={isDevAIOpen}
-                    setIsDevAIOpen={setIsDevAIOpen}
-                />
-            )}
+            {
+                window.Components.GlobalSearch && (
+                    <window.Components.GlobalSearch
+                        showGlobalSearch={showGlobalSearch}
+                        onClose={() => setShowGlobalSearch(false)}
+                        isDarkMode={isDarkMode}
+                    />
+                )
+            }
+
+            {
+                window.Components.UserMenu && (
+                    <window.Components.UserMenu
+                        showUserMenu={showUserMenu}
+                        setShowUserMenu={setShowUserMenu}
+                        isDarkMode={isDarkMode}
+                        setIsDarkMode={setIsDarkMode}
+                        isExpandedMode={isExpandedMode}
+                        setIsExpandedMode={setIsExpandedMode}
+                        notificationsEnabled={notificationsEnabled}
+                        setNotificationsEnabled={setNotificationsEnabled}
+                        workLocation={workLocation}
+                        setWorkLocation={setWorkLocation}
+                        workStatus={workStatus}
+                        setWorkStatus={setWorkStatus}
+                        showLocationModal={showLocationModal}
+                        setShowLocationModal={setShowLocationModal}
+                        showSettingsModal={showSettingsModal}
+                        setShowSettingsModal={setShowSettingsModal}
+                        onOpenApp={handleOpenApp}
+                        onLogout={() => {
+                            localStorage.removeItem('rino_auth_session');
+                            localStorage.removeItem('rino_auth_token');
+                            localStorage.removeItem('rino_user_profile');
+                            setIsAuthenticated(false);
+                            setCurrentUser(null);
+                            setCurrentView('square');
+                        }}
+                        currentUser={currentUser}
+                    />
+                )
+            }
 
             {/* Render Modals as Bottom Sheets ONLY on Mobile */}
             <div className="md:hidden">
@@ -748,12 +746,6 @@ function App() {
                     </div>
                 )}
             </div>
-
-            {/* Dev AI Sidebar Overlay */}
-            {window.Components.DevAISidebar && (
-                <window.Components.DevAISidebar isDarkMode={isDarkMode} isDevAIOpen={isDevAIOpen} setIsDevAIOpen={setIsDevAIOpen} />
-            )}
-
             {/* Hover Tooltip */}
             {
                 hoverTooltip && (

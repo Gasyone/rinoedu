@@ -10,5 +10,5 @@ account_id = "eb59b0246a147814cfe33c96f6ea5607"
 binding = "AI"
 
 [[routes]]
-pattern = "rino.gasy.io/*"
+pattern = "apirinoai.gasy.io/*"
 zone_name = "gasy.io"

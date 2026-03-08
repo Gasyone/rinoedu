@@ -1,5 +1,7 @@
 // src/api/client.js
-const API_BASE = "https://rino.gasy.io/api"; // will be served by Cloudflare Workers
+const API_BASE = (window.RinoRuntimeConfig && window.RinoRuntimeConfig.API_BASE)
+    ? window.RinoRuntimeConfig.API_BASE
+    : "https://apirinoai.gasy.io/api";
 
 /**
  * Global API Request handler mimicking Axios Interceptors.
@@ -54,4 +56,8 @@ export async function apiRequest(path, options = {}) {
 // Example placeholder endpoint – replace with real ones as needed
 export async function getCurrentUser() {
     return apiRequest("/user/me", { method: "GET" });
+}
+
+export async function getIntegrationStatus() {
+    return apiRequest("/integrations/status", { method: "GET" });
 }

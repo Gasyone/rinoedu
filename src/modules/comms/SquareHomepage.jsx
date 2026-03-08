@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { ChatMessage, ScreenContext } from 'src/shared/interfaces/comms';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
-import DevAISidebar from './DevAISidebar';
 
 const SquareHomepage = ({ isDarkMode }) => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -53,7 +52,6 @@ const SquareHomepage = ({ isDarkMode }) => {
                     <MessageInput userId={userId} screenContext={screenContext} />
                 </div>
             </div>
-            <DevAISidebar />
         </div>
     );
 };

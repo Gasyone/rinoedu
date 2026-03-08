@@ -1,0 +1,89 @@
+PROJECT BRIEF: KNOWLEDGE HUB MODULE - PHASE 3 REDESIGN
+
+GIỚI THIỆU:
+Đây là yêu cầu thiết kế lại toàn bộ Module Tri thức (DocumentCenter) của nền tảng giáo dục RinoEdu. Mục tiêu là biến nó thành giao diện "Thư viện Tri thức" đồ sộ và chuyên nghiệp, đồng thời bổ sung tính năng Ticketing (Báo lỗi/Góp ý tài liệu).
+
+=== FILE CẦN SỬA ĐỔI ===
+- src/modules/DocumentCenter.jsx — Viết lại toàn bộ giao diện
+- src/utils/data.jsx — Bổ sung mock data phong phú hơn
+
+=== PHẦN 1: CẬP NHẬT MOCK DATA (data.jsx) ===
+Cập nhật mảng window.Data.MOCK_WHITEPAPERS đang có trong data.jsx.
+Mỗi object bài viết cần BỐ SUNG thêm các trường sau ngoài những trường đã có (id, title, category, author, date, content):
+- summary: Mô tả ngắn 1-2 câu về bài viết (hiển thị trên thẻ card)
+- tags: Mảng từ khoá ["API", "Guide", "Architecture"...] phù hợp với từng bài
+- readTime: Số phút đọc ước tính (ví dụ: 8)
+- icon: Tên emoji hoặc 1 ký tự đại diện cho bài (ví dụ: "🏗️", "🎨", "🔐")
+- audience: Mảng đối tượng người đọc (ví dụ: ["Developer", "Admin"])
+- version: Phiên bản (ví dụ: "v1.2")
+- views: Số lượt xem (mock, ví dụ: 1450)
+
+Thêm tổng cộng 5-6 bài viết mẫu đa dạng để giao diện Thư viện trông đầy đặn.
+
+=== PHẦN 2: ĐẠI TU GIAO DIỆN (DocumentCenter.jsx) ===
+
+Xây dựng lại component window.Modules.DocumentCenter với CẤU TRÚC bố cục như sau:
+
+--- LAYOUT: VIEW "LIST" (Màn hình Thư viện) ---
+
+2A. HERO HEADER (Khu vực 1 - Banner trung tâm)
+- Background gradient đẹp (indigo/violet đậm), chiều cao 200-250px
+- Tiêu đề lớn "Trung tâm Tri thức RinoEdu" cỡ chữ lớn, đậm, màu trắng
+- Dòng phụ mô tả ngắn bên dưới (màu trắng nhạt)
+- Thanh Search LỚN nằm ở trung tâm (chiều rộng 60-70%, rounded-full, icon kính lúp, placeholder "Tìm kiếm tài liệu, khái niệm...")
+- Hiển thị số thống kê nhỏ: "[X] Tài liệu · [Y] Chuyên mục"
+
+2B. CATEGORIES GRID (Khu vực 2 - Kệ sách)
+- Tiêu đề section: "Khám phá theo chủ đề"
+- Hiển thị các Category dưới dạng Grid thẻ card ngang (flex-wrap hoặc grid cols 4-5)
+- Mỗi Category card: Icon emoji lớn ở trên, tên Category ở dưới, số lượng bài viết, background màu pastel riêng theo category, border radius lớn
+- Khi click vào = filter theo Category đó
+
+2C. DOCUMENT CARDS GRID (Khu vực 3 - Danh sách bài viết)
+- Tiêu đề section: "Tất cả tài liệu" (hoặc tên Category khi đang filter)
+- Hiển thị dạng Grid 3-4 cột (responsive)
+- Mỗi Card bài viết gồm:
+  + Vùng màu (gradient nhỏ) có icon emoji của bài ở trên
+  + Category badge nhỏ
+  + Tiêu đề đậm
+  + Summary (mô tả ngắn, text-sm, giới hạn 2 dòng)
+  + Tags (hiển thị tối đa 2-3 tag dạng badge nhỏ)
+  + Footer: Avatar author + readTime + icon chat AI (Hỏi AI)
+  + Hover effect nổi bật (shadow, scale lên nhẹ)
+- Click vào Card = vào Reader view
+
+--- LAYOUT: VIEW "READER" (Chế độ đọc bài) ---
+
+2D. READER VIEW cải tiến:
+- Bố cục: Sidebar mục lục (TOC - Table of Contents) bên trái 250px (sticky),
+  Content đọc ở giữa (tối đa 720px), Action panel bên phải (64px icon actions)
+- Mục lục tự generate từ các heading (## và ###) trong content Markdown
+- Action panel bên phải có các icon: Bookmark, Share, Report Issue (dùng để mở Ticket modal), Hỏi AI
+- Header bài đọc: Category breadcrumb → Tiêu đề lớn → Metadata (author, date, readTime, views)
+
+--- AI DRAWER (Giữ nguyên logic cũ nhưng upgrade UI) ---
+- Khi click "Hỏi AI" hoặc icon Bot, Drawer vẫn slide từ phải ra
+- UI Drawer đồng bộ màu sắc với giao diện Thư viện mới (gradient header mượt mà hơn)
+
+=== PHẦN 3: TICKETING - FORM GÓP Ý/BÁO LỖI TÀI LIỆU ===
+
+3A. Thêm nút "Báo lỗi / Góp ý" (Flag icon) trong Action Panel của Reader View
+
+3B. Khi click mở Modal "Gửi Góp ý Tài liệu" với các trường:
+- Loại góp ý (Select): "Lỗi nội dung", "Thông tin lỗi thời", "Cần bổ sung", "Lỗi chính tả/câu từ"
+- Mô tả cụ thể (Textarea, bắt buộc)
+- Tên người gửi (Input, optional)
+- Trường LOCKED (hiển thị read-only, không sửa được): "Tài liệu liên quan: [title của bài đang đọc]"
+
+3C. Khi Submit:
+- Hiển thị trạng thái Loading (spinner)
+- Sau đó hiển thị Success toast "Cảm ơn bạn! Góp ý đã được ghi nhận và chuyển đến Admin"
+- Đóng Modal sau 2 giây
+
+QUY TẮC CODE:
+- Component phải được gán vào window.Modules.DocumentCenter (kiến trúc hiện tại của dự án)
+- Sử dụng React hooks (useState, useEffect, useRef)
+- Sử dụng window.Icons cho tất cả icon
+- Style bằng Tailwind utility classes (dự án đã dùng Tailwind)
+- Logic gọi AI đến https://apirinoai.gasy.io/mcp/v1/chat GIỮ NGUYÊN (không thay đổi)
+- Giữ toàn bộ tính năng AI Drawer và Admin Create Modal hiện tại, chỉ NÂNG CẤP UI/UX

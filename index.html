@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="./src/assets/styles.css">
     <!-- Design Tokens (Single Source of Truth for all colors, spacing, fonts) -->
     <link rel="stylesheet" href="./src/shared/design-tokens.css">
+    <script src="./src/shared/runtime-config.js"></script>
 
     <!-- 🌟 CORE FAILSAFE PROXIES 🌟 -->
     <script>
@@ -83,13 +84,28 @@
     <script type="text/babel" src="src/components/GlobalSearch.jsx"></script>
     <script type="text/babel" src="src/components/UserMenu.jsx"></script>
     <script type="text/babel" src="src/components/SocialFeed.jsx"></script>
-    <script type="text/babel" src="src/components/DevAISidebar.jsx"></script>
     <script type="text/babel" src="src/components/SubSidebar.jsx"></script>
 
     <!-- COMMON COMPONENTS CORE -->
     <script type="text/babel" src="src/components/common/NotificationBell.jsx"></script>
     <script type="text/babel" src="src/components/common/FileUploader.jsx"></script>
-    <script type="text/babel" src="src/components/common/CreateTicketModal.jsx"></script>
+
+    <!-- PAGES -->
+    <script type="text/babel" src="src/pages/Dashboard.jsx"></script>
+    <script type="text/babel" src="src/pages/SquareHomepage.jsx"></script>
+    <script type="text/babel" src="src/pages/LoginWebapp.jsx"></script>
+
+    <!-- MODULES -->
+    <!-- IAM: Identity & Access Management (formerly: account) -->
+    <script type="text/babel" src="src/modules/iam/AccountSettings.jsx"></script>
+    <script type="text/babel" src="src/modules/iam/AccountSecurity.jsx"></script>
+    <script type="text/babel" src="src/modules/iam/AccountProfile.jsx"></script>
+    <script type="text/babel" src="src/modules/iam/OrgSettings.jsx"></script>
+    <script type="text/babel" src="src/modules/iam/SysUsers.jsx"></script>
+    <script type="text/babel" src="src/modules/iam/AccountManager.jsx"></script>
+
+    <!-- ADMIN MODULES CORE -->
+    <script type="text/babel" src="src/pages/admin/SystemLogs.jsx"></script>
 
     <!-- PAGES -->
     <script type="text/babel" src="src/pages/Dashboard.jsx"></script>
@@ -115,6 +131,8 @@
     <script type="text/babel" src="src/modules/hr/CenterOps.jsx"></script>
     <!-- MDM: Asset / Warehouse Module -->
     <script type="text/babel" src="src/modules/mdm/Warehouse.jsx"></script>
+    <script type="text/babel" src="src/modules/DocumentCenter.jsx"></script>
+
 
     <!-- MAIN APP ENTRY -->
     <script type="text/babel" src="./src/app.jsx"></script>

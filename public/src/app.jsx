@@ -18,7 +18,6 @@ function App() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
     const [showAppLauncher, setShowAppLauncher] = useState(false);
     const [showGlobalSearch, setShowGlobalSearch] = useState(false);
-    const [isDevAIOpen, setIsDevAIOpen] = useState(false); // New state for AI Sidebar toggle
     const [isSwitchingModule, setIsSwitchingModule] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
@@ -334,8 +333,6 @@ function App() {
                     }}
                     showAppLauncher={showAppLauncher}
                     setShowAppLauncher={setShowAppLauncher}
-                    isDevAIOpen={isDevAIOpen}
-                    setIsDevAIOpen={setIsDevAIOpen}
                 />
 
                 {/* Re-using the same global menus on top of the SquareHomepage */}
@@ -370,8 +367,6 @@ function App() {
                             handleOpenApp(id);
                             setCurrentView('workspace');
                         }}
-                        isDevAIOpen={isDevAIOpen}
-                        setIsDevAIOpen={setIsDevAIOpen}
                     />
                 )}
                 {showAppLauncher && isAuthenticated && (
@@ -395,8 +390,6 @@ function App() {
                     />
                 )}
 
-                {/* Dev AI Sidebar Overlay */}
-                {isAuthenticated && <DevAISidebar isDarkMode={isDarkMode} isDevAIOpen={isDevAIOpen} setIsDevAIOpen={setIsDevAIOpen} />}
             </div>
         );
     }
@@ -466,8 +459,6 @@ function App() {
                         markAsRead={markAsRead}
                         markAllAsRead={markAllAsRead}
                         notifications={notifications}
-                        isDevAIOpen={isDevAIOpen}
-                        setIsDevAIOpen={setIsDevAIOpen}
                     />
 
                     {/* MOBILE HORIZONTAL APP NAVIGATION (Below Header) */}
@@ -649,7 +640,6 @@ function App() {
                 showGlobalSearch={showGlobalSearch}
                 onClose={() => setShowGlobalSearch(false)}
                 isDarkMode={isDarkMode}
-                setIsDevAIOpen={setIsDevAIOpen}
             />
 
             <UserMenu
@@ -679,8 +669,6 @@ function App() {
                     setCurrentView('square');
                 }}
                 currentUser={currentUser}
-                isDevAIOpen={isDevAIOpen}
-                setIsDevAIOpen={setIsDevAIOpen}
             />
 
             {/* Render Modals as Bottom Sheets ONLY on Mobile */}
@@ -732,9 +720,6 @@ function App() {
                     </div>
                 )}
             </div>
-
-            {/* Dev AI Sidebar Overlay */}
-            <DevAISidebar isDarkMode={isDarkMode} isDevAIOpen={isDevAIOpen} setIsDevAIOpen={setIsDevAIOpen} />
 
             {/* Hover Tooltip */}
             {

@@ -8,6 +8,7 @@ window.Components = window.Components || {};
  */
 window.Components.FileUploader = ({ onUploadSuccess, accept = "*/*", maxSizeMB = 5 }) => {
     const { FileUp, X, CheckCircle, AlertCircle } = window.Icons || {};
+    const runtimeConfig = window.RinoRuntimeConfig || {};
     const [file, setFile] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
     const [status, setStatus] = useState('idle'); // idle | uploading | success | error
@@ -44,7 +45,8 @@ window.Components.FileUploader = ({ onUploadSuccess, accept = "*/*", maxSizeMB =
         // MOCK API: Giả lập thời gian upload lên Server (Cloudflare R2 / S3)
         setTimeout(() => {
             setStatus('success');
-            const mockUrl = `https://cdn.rino.gasy.io/uploads/${Date.now()}_${file.name}`;
+            const uploadBase = runtimeConfig.UPLOAD_BASE || 'https://cdn.apirinoai.gasy.io/uploads';
+            const mockUrl = `${uploadBase}/${Date.now()}_${file.name}`;
             if (onUploadSuccess) onUploadSuccess(mockUrl);
 
             // Xóa file sau 2s để có thể up thẻ mới

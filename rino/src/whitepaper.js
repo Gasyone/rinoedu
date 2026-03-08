@@ -45,10 +45,9 @@ Mã nguồn ứng dụng được chia thành các Khối độc lập (Modules)
 | **Sidebar** | \`src/components/Sidebar.jsx\` | Navigation chính, collapse/expand, icon-only mode |
 | **SubSidebar** | \`src/components/SubSidebar.jsx\` | Menu phụ theo module đang active |
 | **AppLauncher** | \`src/components/AppLauncher.jsx\` | Grid apps, Drag & Drop reorder, Category filter |
-| **GlobalSearch** | \`src/components/GlobalSearch.jsx\` | Ctrl+K, real-time filter, AI mode toggle |
+| **GlobalSearch** | \`src/components/GlobalSearch.jsx\` | Ctrl+K, real-time filter, category search |
 | **UserMenu** | \`src/components/UserMenu.jsx\` | Workspace switcher, Dark mode, Logout |
 | **NotificationBell** | \`src/components/common/NotificationBell.jsx\` | SSE mock, badge count, mark-all-read |
-| **DevAISidebar** | \`src/components/DevAISidebar.jsx\` | Chat AI panel, Markdown render, Code highlight |
 
 ### 3.3 Giao diện Trang Chủ (SquareHomepage)
 Component chính: \`src/pages/SquareHomepage.jsx\` (URL: \`#/home\`)
@@ -73,10 +72,9 @@ Dashboard là màn hình làm việc chính sau khi đăng nhập, bao gồm:
 - **Chờ phê duyệt (Pending Approvals):** Card gradient cam-đỏ hiển thị số phiếu chờ duyệt (Nghỉ phép, PO, Tạm ứng) + nút "Xử lý ngay".
 - **Hoạt động cá nhân (Activity Feed):** Timeline các hành động gần đây của user (duyệt PO, meeting, cập nhật hồ sơ...) + nút "Xem tất cả".
 
-### 3.5 Module Hỗ trợ (Ticket Management)
-Component chính: \`src/components/common/CreateTicketModal.jsx\`
-- **Tạo Ticket thủ công:** Từ **Trang chủ Dashboard**, người dùng nhấn vào nút **"Thêm mới"** (biểu tượng dấu +) nằm ở phần lưới **Truy cập nhanh** để mở Modal tạo Ticket Yêu cầu hỗ trợ (hoặc báo lỗi/đề xuất tính năng). Khai báo Tiêu đề, Vai trò, Loại, Mô tả chi tiết rồi Submit.
-- **Nhờ Rino AI tạo:** Người dùng có thể nhắn trực tiếp với hệ thống AI RinoEdu (ví dụ: "giúp tôi tạo một ticket bị lỗi UI trang chủ"). Hệ thống AI sẽ hỏi lại tiêu đề và mô tả, sau đó sử dụng tool nội bộ để tự động tạo Ticket gửi lên server.
+### 3.5 Hành động Nhanh trên Dashboard
+- **Thêm mới:** Ô **"Thêm mới"** trong lưới **Truy cập nhanh** hiện đóng vai trò placeholder để mở rộng các workflow nội bộ sau này.
+- **Phê duyệt nhanh:** Dashboard ưu tiên hiển thị nhóm thẻ hành động nhanh như KPI, phê duyệt chờ xử lý và activity feed.
 
 ---
 
@@ -259,13 +257,11 @@ flowchart TD
     A["Nhấn Ctrl+K"] --> B["GlobalSearch mở"]
     B --> C{User gõ keyword}
     C --> D["Filter real-time apps"]
-    C --> E["Nhấn Sparkles ✨"]
-    E --> F["Chuyển sang AI mode"]
-    F --> G["DevAISidebar mở"]
-    G --> H["User nhập câu hỏi"]
-    H --> I["RinoAI.sendMessage()"]
-    I --> J["KB keyword matching"]
-    J --> K["Stream response từng từ"]
+    C --> E["Người dùng mở AI từ Homepage"]
+    E --> F["SquareHomepage gửi câu hỏi"]
+    F --> G["RinoAI.sendMessage()"]
+    G --> H["KB keyword matching"]
+    H --> I["Stream response từng từ"]
 \`\`\`
 
 ---
@@ -275,10 +271,10 @@ flowchart TD
 ### 7.1 Kiến trúc AI Hiện tại
 \`\`\`
 ┌─────────────────────────────────────────────┐
-│  Frontend (DevAISidebar.jsx)                │
+│  Frontend (SquareHomepage.jsx)              │
 │  ├── Input → RinoAI.sendMessage()           │
 │  ├── Streaming response (word-by-word)      │
-│  └── Markdown render + Code highlight       │
+│  └── Markdown render                        │
 ├─────────────────────────────────────────────┤
 │  AI Engine (src/api/ai.js)                  │
 │  ├── Knowledge Base: 12 Q&A categories      │

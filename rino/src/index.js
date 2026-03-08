@@ -1,53 +1,43 @@
-/**
- * Rino Worker — Reverse Proxy + AI Endpoint (OpenAI GPT-4o-mini)
- * 
- * This Worker serves two purposes:
- * 1. Proxies all web requests to the Cloudflare Tunnel
- * 2. Provides AI chat endpoint at /mcp/v1/chat, powered by OpenAI
- */
+const OPENAI_API_URL = "https://api.openai-proxy.com/v1/chat/completions";
+const OPENAI_MODEL = "gpt-4o-mini";
 
-const TUNNEL_ORIGIN = "https://67abe048-6e57-4883-b4a7-ebff1b1cbba6.cfargotunnel.com";
-const OPENAI_API_URL = "https://api.openai-proxy.com/v1/chat/completions"; // Pure pass-through Proxy that accepts official OpenAI sk- keys
-const OPENAI_MODEL = "gpt-5.4";
+import { WHITEPAPER_CONTENT } from "./whitepaper.js";
 
-import { WHITEPAPER_CONTENT } from './whitepaper.js';
-
-// ── OpenAI Function Calling Tool Definitions ──
 const openaiTools = [
     {
         type: "function",
         function: {
             name: "read_whitepaper",
-            description: "ĐỌC tài liệu Sách Trắng RinoEdu — LUÔN LUÔN gọi tool này KHI người dùng hỏi về: tính năng màn hình, giao diện, UI, Homepage, Dashboard, module, kiến trúc hệ thống, component, hoặc BẤT CỨ điều gì liên quan đến nền tảng RinoEdu.",
-            parameters: { type: "object", properties: {}, required: [] }
-        }
+            description: "Doc tai lieu sach trang RinoEdu. Luon uu tien goi tool nay khi nguoi dung hoi ve tinh nang, giao dien, module, homepage, dashboard hoac kien truc san pham.",
+            parameters: { type: "object", properties: {}, required: [] },
+        },
     },
     {
         type: "function",
         function: {
-            name: "create_ticket",
-            description: "Tạo một Support Ticket (yêu cầu hỗ trợ/báo lỗi/tính năng mới) trên hệ thống RinoEdu dựa trên yêu cầu người dùng.",
+            name: "create_document",
+            description: "Tao mot tai lieu whitepaper, guideline, hoac quy trinh moi vao trong he thong Trung tam Tri thuc RinoEdu.",
             parameters: {
                 type: "object",
                 properties: {
-                    title: { type: "string", description: "Tiêu đề ngắn gọn của ticket" },
-                    description: { type: "string", description: "Mô tả chi tiết nội dung cần hỗ trợ" },
-                    type: { type: "string", enum: ["Bug", "Feature", "Question"], description: "Phân loại ticket" }
+                    title: { type: "string", description: "Tieu de cua tai lieu" },
+                    category: { type: "string", description: "Danh muc tai lieu (vi du: Architecture, Development, Process, Security, General)" },
+                    content: { type: "string", description: "Noi dung text cua tai lieu duoc dinh dang sang chuan Markdown giup hien thi tot nhat tren giao dien." }
                 },
-                required: ["title", "description", "type"]
-            }
-        }
-    }
+                required: ["title", "category", "content"]
+            },
+        },
+    },
 ];
 
-// ── Call OpenAI Chat Completions API ──
 async function callOpenAI(messages, env, useTools = true) {
     const body = {
         model: OPENAI_MODEL,
-        messages: messages,
+        messages,
         temperature: 0.7,
-        max_tokens: 1500,
+        max_completion_tokens: 1500,
     };
+
     if (useTools) {
         body.tools = openaiTools;
         body.tool_choice = "auto";
@@ -57,88 +47,127 @@ async function callOpenAI(messages, env, useTools = true) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${env.OPENAI_API_KEY}`,
+            Authorization: `Bearer ${env.OPENAI_API_KEY}`,
         },
         body: JSON.stringify(body),
     });
 
     if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`OpenAI API Error ${response.status}: ${errText}`);
+        const errorText = await response.text();
+        throw new Error(`OpenAI API error ${response.status}: ${errorText}`);
     }
 
     return await response.json();
 }
 
+function corsHeaders(extraHeaders = {}) {
+    return {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        ...extraHeaders,
+    };
+}
+
+function jsonResponse(payload, init = {}) {
+    return new Response(JSON.stringify(payload), {
+        ...init,
+        headers: corsHeaders({
+            "Content-Type": "application/json",
+            ...(init.headers || {}),
+        }),
+    });
+}
+
+function buildSystemPrompt(screenContext) {
+    if (screenContext.role === 'admin_doc_generator') {
+        return `Bạn là một AI chuyên viết tài liệu kỹ thuật (Technical Writer) của nền tảng RinoEdu.
+Nhiệm vụ của bạn là sinh ra các tài liệu Guideline, Whitepaper, Quy trình chuẩn.
+YÊU CẦU BẮT BUỘC:
+1. BẠN CHỈ ĐƯỢC PHÉP TRẢ VỀ NỘI DUNG MARKDOWN (.md).
+2. KHÔNG BAO GỒM BẤT KỲ CÂU GIAO TIẾP NÀO VỚI NGƯỜI DÙNG (Không có "Dưới đây là tài liệu của bạn", không có "Có vẻ như...", không có lời giải thích hay kết luận).
+3. LUÔN LUÔN trả lời bằng tiếng Việt.
+4. Trình bày bài viết có tính thẩm mỹ, dùng Headers (H1, H2, H3), Bullet points và Bold thật chuyên nghiệp. Bắt đầu ngay lập tức bằng thẻ # Tiêu đề.`;
+    }
+
+    // --- DYNAMIC CONTEXT INJECTION FOR DOCUMENT CENTER ---
+    if (screenContext.articleId && screenContext.articleContent) {
+        return `Bạn là Trợ lý AI chuyên môn giải đáp thắc mắc về tài liệu: "${screenContext.articleTitle || screenContext.articleId}".
+YÊU CẦU QUAN TRỌNG:
+1. LUÔN LUÔN trả lời bằng tiếng Việt.
+2. CHỈ trả lời dựa trên nội dung tài liệu được cung cấp dưới đây. Nếu thông tin không có trong tài liệu, hãy nói rõ là "Tài liệu này không đề cập đến vấn đề đó". Không tự bịa thông tin bên ngoài.
+3. Trình bày câu trả lời ngắn gọn, rõ ràng, dùng bullet points nếu cần.
+
+--- NỘI DUNG TÀI LIỆU ---
+${screenContext.articleContent}
+--- HẾT NỘI DUNG TÀI LIỆU ---`;
+    }
+
+    let prompt = `Ban la RinoEdu AI, tro ly cua nen tang quan ly giao duc RinoEdu.
+
+QUY TAC:
+1. Luon tra loi bang tieng Viet, gon, ro rang va co cau truc Markdown khi can.
+2. Khong lap lai loi chao mac dinh tru khi nguoi dung hoi truc tiep ban la ai.
+3. Khi nguoi dung hoi ve tinh nang, man hinh, giao dien, homepage, dashboard, module, kien truc hoac bat ky thong tin nao lien quan den san pham RinoEdu, bat buoc goi tool \`read_whitepaper\`.
+4. Khong tu bua tinh nang. Neu khong chac, noi ro gioi han thong tin.
+5. Neu co ngu canh man hinh hien tai, uu tien dua tren ngu canh do roi moi bo sung tu whitepaper.
+6. Frontend RinoEdu dang duoc deploy tai: https://rinoedu-app.pages.dev`;
+
+    if (screenContext.screenName || screenContext.path) {
+        prompt += `\n\n--- NGU CANH MAN HINH HIEN TAI ---`;
+        if (screenContext.screenName) prompt += `\nMan hinh: ${screenContext.screenTitle || screenContext.screenName}`;
+        if (screenContext.currentModule) prompt += `\nModule: ${screenContext.currentModule}`;
+        if (screenContext.path) prompt += `\nURL: \`${screenContext.url || screenContext.path}\``;
+        if (screenContext.activeMode) prompt += `\nChe do: ${screenContext.activeMode}`;
+        if (screenContext.visibleQuickApps) prompt += `\nTruy cap nhanh: ${screenContext.visibleQuickApps.join(", ")}`;
+        if (screenContext.uiElements) prompt += `\nThanh phan UI hien thi:\n${screenContext.uiElements.map((item) => `- ${item}`).join("\n")}`;
+        if (screenContext.isAuthenticated !== undefined) prompt += `\nDang nhap: ${screenContext.isAuthenticated ? "Da dang nhap" : "Chua dang nhap"}`;
+        if (screenContext.currentUser) prompt += `\nUser: ${screenContext.currentUser.name} (${screenContext.currentUser.role || "N/A"})`;
+        if (screenContext.role) prompt += `\nVai tro nguoi hoi: ${screenContext.role}`;
+        prompt += `\n--- HET NGU CANH ---`;
+    }
+
+    return prompt;
+}
+
 export default {
-    async fetch(request, env, ctx) {
+    async fetch(request, env) {
         const url = new URL(request.url);
 
-        // Basic CORS handling
         if (request.method === "OPTIONS") {
-            return new Response(null, {
-                headers: {
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-                },
-            });
+            return new Response(null, { headers: corsHeaders() });
         }
 
-        // MCP Ping endpoint
         if (url.pathname === "/mcp/v1/ping") {
-            return new Response(JSON.stringify({ status: "ok", message: "MCP alive" }), {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
+            return jsonResponse({ status: "ok", message: "MCP alive" });
+        }
+
+        if (url.pathname === "/api/integrations/status" && request.method === "GET") {
+            return jsonResponse({
+                status: "success",
+                integrations: {
+                    openai: Boolean(env.OPENAI_API_KEY),
+                    whitepaper: Boolean(WHITEPAPER_CONTENT),
+                    model: OPENAI_MODEL,
                 },
             });
         }
 
-        // AI Chat Endpoint — Powered by OpenAI GPT-4o-mini
         if (url.pathname === "/mcp/v1/chat" && request.method === "POST") {
             try {
                 const body = await request.json();
+                const screenContext = body.context || {};
+                const messageHistory = Array.isArray(body.messages) ? body.messages : [];
                 const userQuery = body.message || "";
-                const ctx = body.context || {};
-                const messageHistory = body.messages || [];
 
-                let systemPrompt = `Bạn là RinoEdu AI — trợ lý thông minh của nền tảng quản lý giáo dục RinoEdu.
-
-QUY TẮC QUAN TRỌNG:
-1. Luôn trả lời bằng tiếng Việt.
-2. KHÔNG BAO GIỜ tự giới thiệu hoặc lặp lại câu chào "Xin chào! Tôi là RinoEdu AI..." trừ khi người dùng nói "bạn là ai" hoặc "giới thiệu bản thân".
-3. **QUY TẮC ƯU TIÊN TOOL**: Khi người dùng hỏi về TÍNH NĂNG, MÀN HÌNH, GIAO DIỆN, MODULE, KIẾN TRÚC, HOMEPAGE, DASHBOARD, hoặc BẤT CỨ GÌ liên quan đến sản phẩm RinoEdu → BẮT BUỘC gọi tool \`read_whitepaper\`. KHÔNG BAO GIỜ dùng \`confluence_search\` cho các câu hỏi này. Tool \`confluence_search\` CHỈ được dùng khi user hỏi về dự án, sprint, hoặc task quản lý.
-4. Trả lời ngắn gọn, rõ ràng, có cấu trúc Markdown.
-5. Khi trả lời câu hỏi về tính năng trên màn hình, hãy mô tả CHÍNH XÁC theo tài liệu Whitepaper và danh sách uiElements từ Frontend. KHÔNG tự bịa tính năng.
-6. Nếu trong NGỮ CẢNH MÀN HÌNH có thông tin, hãy dùng nó để trả lời trước, sau đó bổ sung bằng Whitepaper nếu cần.`;
-
-                // Inject rich screen context into system prompt
-                if (ctx.screenName || ctx.path) {
-                    systemPrompt += `\n\n--- NGỮ CẢNH MÀN HÌNH HIỆN TẠI ---`;
-                    if (ctx.screenName) systemPrompt += `\nMàn hình: ${ctx.screenTitle || ctx.screenName}`;
-                    if (ctx.currentModule) systemPrompt += `\nModule: ${ctx.currentModule}`;
-                    if (ctx.path) systemPrompt += `\nURL: \`${ctx.url || ctx.path}\``;
-                    if (ctx.activeMode) systemPrompt += `\nChế độ: ${ctx.activeMode}`;
-                    if (ctx.visibleQuickApps) systemPrompt += `\nTruy cập nhanh: ${ctx.visibleQuickApps.join(', ')}`;
-                    if (ctx.uiElements) systemPrompt += `\nCác thành phần UI hiển thị:\n${ctx.uiElements.map(e => '- ' + e).join('\n')}`;
-                    if (ctx.isAuthenticated !== undefined) systemPrompt += `\nĐăng nhập: ${ctx.isAuthenticated ? 'Đã đăng nhập' : 'Chưa đăng nhập'}`;
-                    if (ctx.currentUser) systemPrompt += `\nUser: ${ctx.currentUser.name} (${ctx.currentUser.role || 'N/A'})`;
-                    if (ctx.role) systemPrompt += `\nVai trò người hỏi: ${ctx.role}`;
-                    systemPrompt += `\n--- HẾT NGỮ CẢNH ---`;
-                }
-
-                // Build messages array
-                const messages = [
-                    { role: "system", content: systemPrompt }
-                ];
+                const messages = [{ role: "system", content: buildSystemPrompt(screenContext) }];
 
                 if (messageHistory.length > 0) {
-                    for (const msg of messageHistory) {
-                        if (msg.role !== "system") {
+                    for (const message of messageHistory) {
+                        if (message.role !== "system") {
                             messages.push({
-                                role: msg.role === "ai" ? "assistant" : "user",
-                                content: msg.content
+                                role: message.role === "ai" ? "assistant" : "user",
+                                content: message.content,
                             });
                         }
                     }
@@ -146,90 +175,74 @@ QUY TẮC QUAN TRỌNG:
                     messages.push({ role: "user", content: userQuery });
                 }
 
-                // --- OpenAI AGENT LOOP with Function Calling ---
-                const MAX_ITERATIONS = 3;
+                const maxIterations = 3;
                 let iteration = 0;
-                let finalReply = "Xin lỗi, tôi không thể xử lý yêu cầu lúc này.";
+                let finalReply = "Xin loi, toi khong the xu ly yeu cau luc nay.";
 
-                while (iteration < MAX_ITERATIONS) {
-                    iteration++;
-
+                while (iteration < maxIterations) {
+                    iteration += 1;
                     const data = await callOpenAI(messages, env, iteration <= 2);
                     const choice = data.choices?.[0];
 
                     if (!choice) {
-                        finalReply = "Lỗi: Không nhận được phản hồi từ AI.";
+                        finalReply = "Loi: khong nhan duoc phan hoi tu AI.";
                         break;
                     }
 
-                    const assistantMsg = choice.message;
+                    const assistantMessage = choice.message;
 
-                    // Check if GPT wants to call a function
-                    if (assistantMsg.tool_calls && assistantMsg.tool_calls.length > 0) {
-                        // Add the assistant's tool_calls message to history
-                        messages.push(assistantMsg);
+                    if (assistantMessage.tool_calls && assistantMessage.tool_calls.length > 0) {
+                        messages.push(assistantMessage);
 
-                        // Execute each tool call and add results
-                        for (const tc of assistantMsg.tool_calls) {
-                            const fnName = tc.function.name;
-                            let args = {};
-                            try { args = JSON.parse(tc.function.arguments); } catch (e) { }
-
+                        for (const toolCall of assistantMessage.tool_calls) {
                             let toolResult = "";
+
                             try {
-                                if (fnName === "read_whitepaper") {
+                                if (toolCall.function.name === "read_whitepaper") {
                                     toolResult = WHITEPAPER_CONTENT;
-                                } else if (fnName === "create_ticket") {
-                                    // Mocking ticket creation for the AI response
-                                    toolResult = JSON.stringify({
-                                        status: "success",
-                                        message: "Ticket created successfully.",
-                                        ticket_id: "TICK-" + Math.floor(Math.random() * 9000 + 1000),
-                                        details: args
+                                } else if (toolCall.function.name === "create_document") {
+                                    let args = {};
+                                    try {
+                                        args = JSON.parse(toolCall.function.arguments);
+                                    } catch (e) { }
+                                    return jsonResponse({
+                                        reply: `Tuyệt vời! Tôi đã tạo xong tài liệu **"${args.title || 'Không tên'}"**. Bạn có thể xem nó ngay trong danh sách bên trái.`,
+                                        action: { type: "ADD_DOCUMENT", data: args }
                                     });
                                 } else {
-                                    toolResult = JSON.stringify({ error: "Unknown tool: " + fnName });
+                                    toolResult = JSON.stringify({ error: `Unknown tool: ${toolCall.function.name}` });
                                 }
-                            } catch (err) {
-                                toolResult = JSON.stringify({ error: err.message });
+                            } catch (error) {
+                                toolResult = JSON.stringify({ error: error.message });
                             }
 
-                            // Add tool result using the proper "tool" role
                             messages.push({
                                 role: "tool",
-                                tool_call_id: tc.id,
-                                content: toolResult
+                                tool_call_id: toolCall.id,
+                                content: toolResult,
                             });
                         }
-                        // Loop continues — GPT will now generate a response using tool results
-                    } else {
-                        // GPT provided a final text response
-                        finalReply = assistantMsg.content || finalReply;
-                        break;
+
+                        continue;
                     }
+
+                    finalReply = assistantMessage.content || finalReply;
+                    break;
                 }
 
-                return new Response(JSON.stringify({
+                return jsonResponse({
                     status: "success",
-                    reply: finalReply
-                }), {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Access-Control-Allow-Origin": "*",
-                    },
+                    reply: finalReply,
                 });
-            } catch (e) {
-                return new Response(JSON.stringify({ error: e.message, stack: e.stack }), {
-                    status: 500,
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Access-Control-Allow-Origin": "*",
-                    },
-                });
+            } catch (error) {
+                console.error("Rino chat worker error:", error);
+                return jsonResponse({ status: "error", error: "Internal server error" }, { status: 500 });
             }
         }
 
-        // ── FALLBACK ROUTE: Redirect to Frontend (Cloudflare Pages) ──
-        return Response.redirect("https://rinoedu-app.pages.dev/#/home", 302);
+        return new Response("RinoEdu AI API Server", {
+            status: 200,
+            headers: corsHeaders({ "Content-Type": "text/plain; charset=utf-8" }),
+        });
     },
 };

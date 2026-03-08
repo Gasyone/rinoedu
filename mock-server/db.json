@@ -202,5 +202,15 @@
     ],
     "comms_tickets": [
         {}
+    ],
+    "comms_categories": [
+        {},
+        {},
+        {},
+        {},
+        {}
+    ],
+    "comms_documents": [
+        {}
     ]
 }
